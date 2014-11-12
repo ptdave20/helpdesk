@@ -2,7 +2,8 @@ package main
 
 import (
 	//"encoding/json"
-	"github.com/golang/oauth2"
+	//"github.com/go-martini/martini"
+	//"github.com/golang/oauth2"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"time"
@@ -54,42 +55,4 @@ func UserCreate(mSession *mgo.Session, user GoogleUserV2) (User, error) {
 	}
 
 	return newUser, nil
-}
-
-func CreateUserSession(mSession *mgo.Session, user User, token oauth2.Token) (string, error) {
-	session := mSession.Clone()
-
-	// Close our session
-	defer session.Close()
-
-	var newSession Session
-	newSession.Id = bson.NewObjectId()
-	newSession.Active = true
-	newSession.Expires = token.Expiry
-	newSession.Refresh = token.RefreshToken
-	newSession.UserId = user.Id
-
-	col := session.DB("helpdesk").C("session")
-	err := col.Insert(newSession)
-
-	if err != nil {
-		return "", err
-	}
-
-	return newSession.Id.String(), nil
-}
-
-func GetSession(mSession *mgo.Session, id string) Session {
-	session := mSession.Clone()
-
-	// Close our session
-	defer session.Close()
-
-	col := session.DB("helpdesk").C("session")
-
-	s := new(Session)
-
-	col.Find(bson.M{"_id": bson.ObjectId(id)}).One(s)
-
-	return *s
 }
