@@ -3,7 +3,6 @@ package main
 import (
 	//"encoding/json"
 	"github.com/golang/oauth2"
-	"github.com/golang/oauth2/google"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"time"
@@ -80,9 +79,17 @@ func CreateUserSession(mSession *mgo.Session, user User, token oauth2.Token) (st
 	return newSession.Id.String(), nil
 }
 
-func GetSession(mSession *mgo.Session, string id) Session {
+func GetSession(mSession *mgo.Session, id string) Session {
 	session := mSession.Clone()
 
 	// Close our session
 	defer session.Close()
+
+	col := session.DB("helpdesk").C("session")
+
+	s := new(Session)
+
+	col.Find(bson.M{"_id": bson.ObjectId(id)}).One(s)
+
+	return *s
 }

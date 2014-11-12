@@ -101,7 +101,7 @@ type (
 	Session struct {
 		Id      bson.ObjectId `bson:"_id,omitempty"`
 		UserId  bson.ObjectId `bson:"user_id,omitempty"`
-		Active  bson.ObjectId `bson:"active"`
+		Active  bool          `bson:"active"`
 		Token   string        `bson:"token"`
 		Expires time.Time     `bson:"expires"`
 		Refresh string        `bson:"refresh"`
