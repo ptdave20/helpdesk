@@ -30,18 +30,15 @@ func main() {
 	}
 
 	m.Use(gzip.All())
-	m.Use(sessions.Sessions("helpdes-session", sessions.NewCookieStore([]byte("session"))))
-	m.Use(oauth2.Google(&goauth2.Options{
-		ClientID:     "812975936151-i8po4eflb6fggohokgl98d5998uh4t6k.apps.googleusercontent.com",
-		ClientSecret: "5oqoK2q-_lnHO5kCdB8DjSyh",
-		RedirectURL:  "http://localhost/o/token",
-		Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile"},
-	}))
-
+	m.Use(sessions.Sessions("helpdesk-session", sessions.NewCookieStore([]byte("session"))))
+	m.Use(oauth2.Google(
+		goauth2.Client("812975936151-i8po4eflb6fggohokgl98d5998uh4t6k.apps.googleusercontent.com", "5oqoK2q-_lnHO5kCdB8DjSyh"),
+		goauth2.RedirectURL("http://localhost/o/token"),
+		goauth2.Scope("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"),
+	))
 	// Tokens are injected to the handlers
 	m.Get("/", func(tokens oauth2.Tokens) string {
-		if tokens.IsExpired() {
+		if tokens.Expired() {
 			return "not logged in, or the access token is expired"
 		}
 		return "logged in"
