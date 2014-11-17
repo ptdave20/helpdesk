@@ -4,7 +4,11 @@ import (
 	"github.com/go-martini/martini"
 	//goauth2 "github.com/golang/oauth2"
 	//"github.com/martini-contrib/gzip"
+<<<<<<< HEAD
 	"github.com/martini-contrib/oauth2"
+=======
+	//"github.com/martini-contrib/oauth2"
+>>>>>>> 52179a7d6a38c1c9f904c475275d43bf740a9667
 	"github.com/martini-contrib/sessions"
 	//"labix.org/v2/mgo"
 )
@@ -14,6 +18,7 @@ import (
 
 func main() {
 	m := martini.Classic()
+<<<<<<< HEAD
 	oauth2.PathLogin = "/o/login"
 	oauth2.PathLogout = "/o/logout"
 	//oauth2.PathCallback = "/o/token"
@@ -45,6 +50,18 @@ func main() {
 				return tokens.Access()
 			})
 	*/
+=======
+
+	m.Use(MongoDB())
+	//m.Use(gzip.All())
+	m.Use(sessions.Sessions("session", sessions.NewCookieStore([]byte("session"))))
+	m.Use(Oauth2Handler())
+
+	m.Get("/data", RequireLogin(), func(user *User) string {
+		return "Hello " + user.Firstname
+	})
+
+>>>>>>> 52179a7d6a38c1c9f904c475275d43bf740a9667
 	m.RunOnAddr(":80")
 
 }

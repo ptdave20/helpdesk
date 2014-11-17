@@ -17,3 +17,16 @@ func MongoDB() martini.Handler {
 		c.Next()
 	}
 }
+<<<<<<< HEAD
+=======
+
+const (
+	UsersC          string = "users"
+	SessionsC       string = "sessions"
+	TicketsC        string = "tickets"
+	DomainsC        string = "domains"
+	DepartmentsC    string = "departments"
+	DocumentC       string = "documents"
+	DomainSettingsC string = "domain_settings"
+)
+>>>>>>> 52179a7d6a38c1c9f904c475275d43bf740a9667
