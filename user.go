@@ -74,12 +74,13 @@ func RequireLogin() martini.Handler {
 }
 
 func Oauth2Handler() martini.Handler {
-	cfg, _ := google.NewConfig(&oauth2.Options{
-		ClientID:     "812975936151-i8po4eflb6fggohokgl98d5998uh4t6k.apps.googleusercontent.com",
-		ClientSecret: "5oqoK2q-_lnHO5kCdB8DjSyh",
-		RedirectURL:  "http://localhost/o/token",
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
-	})
+
+	cfg, _ := oauth2.New(
+		oauth2.Client("812975936151-i8po4eflb6fggohokgl98d5998uh4t6k.apps.googleusercontent.com", "5oqoK2q-_lnHO5kCdB8DjSyh"),
+		oauth2.RedirectURL("http://localhost/o/token"),
+		oauth2.Scope("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"),
+		google.Endpoint(),
+	)
 
 	return func(db *mgo.Database, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
@@ -95,7 +96,7 @@ func Oauth2Handler() martini.Handler {
 				u := r.URL
 				next := u.Query().Get("state")
 				code := u.Query().Get("code")
-				transport, err := cfg.NewTransportWithCode(code)
+				transport, err := cfg.NewTransportFromCode(code)
 				if err != nil {
 					print(err.Error())
 					//http.Redirect(w, r, "/o/error", 302)
@@ -161,4 +162,13 @@ func CreateUserSession(db *mgo.Database, user User, token *oauth2.Token) string 
 	col.Insert(ns)
 
 	return ns.Id.Hex()
+}
+
+func GetUserById(db *mgo.Database, id string) *User {
+	u := new(User)
+	err := db.C(UsersC).Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(u)
+	if err != nil {
+		return nil
+	}
+	return u
 }

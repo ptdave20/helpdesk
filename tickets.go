@@ -7,16 +7,37 @@ import (
 
 func InitTicketService(m *martini.ClassicMartini) {
 	m.Group("/o/ticket", func(r martini.Router) {
-		r.Get("/:id", func(db *mgo.Database, params martini.Params) string {
+		r.Get("/info/:id", func(db *mgo.Database, params martini.Params) string {
 			return params["id"]
 		})
 		r.Group("/list", func(r martini.Router) {
-			r.Get("/", func() string {
+			r.Get("/**", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+				switch p["_1"] {
+				case "department":
+					return HandleDepartmentTickets(db, p["_2"])
+					break
+				case "mine":
+					return HandleUserTickets(db, u, p["_2"])
+					break
+				case "user":
+					return "unimplemented"
+					break
+				}
 				return ""
-			})
-			r.Get("/:area/:type", func(db *mgo.Database, p martini.Params) string {
-				return p["area"] + "/" + p["type"]
 			})
 		})
 	})
+}
+
+func HandleDepartmentTickets(db *mgo.Database, t string) string {
+	return t
+}
+
+func HandleAssignedTickets(db *mgo.Database, t string) string {
+	return t
+}
+
+func HandleUserTickets(db *mgo.Database, u User, t string) string {
+
+	return t
 }

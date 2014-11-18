@@ -2,15 +2,8 @@ package main
 
 import (
 	"github.com/go-martini/martini"
-	//goauth2 "github.com/golang/oauth2"
-	//"github.com/martini-contrib/gzip"
-	//"github.com/martini-contrib/oauth2"
 	"github.com/martini-contrib/sessions"
-	//"labix.org/v2/mgo"
 )
-
-//var Cfg *oauth2.Config
-//var MongoSession *mgo.Session
 
 func main() {
 	m := martini.Classic()
