@@ -23,7 +23,7 @@ func main() {
 	m.Get("/data", RequireLogin(), func(user *User) string {
 		return "Hello " + user.Firstname
 	})
-
+	InitTicketService(m)
 	m.RunOnAddr(":80")
 
 }
