@@ -172,3 +172,11 @@ func GetUserById(db *mgo.Database, id string) *User {
 	}
 	return u
 }
+
+func InitializeUserService(m *martini.ClassicMartini) {
+	m.Group("/o/user", func(r martini.Router) {
+		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
+			return ""
+		})
+	})
+}

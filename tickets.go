@@ -26,6 +26,12 @@ func InitTicketService(m *martini.ClassicMartini) {
 				return ""
 			})
 		})
+		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			return ""
+		})
+		r.Post("/insert", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			return ""
+		})
 	})
 }
 
