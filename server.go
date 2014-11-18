@@ -60,8 +60,12 @@ func main() {
 	m.Get("/data", RequireLogin(), func(user *User) string {
 		return "Hello " + user.Firstname
 	})
+<<<<<<< HEAD
 
 >>>>>>> 52179a7d6a38c1c9f904c475275d43bf740a9667
+=======
+	InitTicketService(m)
+>>>>>>> 0116bb3a09ddc21a241e3a4f1df67a3bd1cd19f3
 	m.RunOnAddr(":80")
 
 }
