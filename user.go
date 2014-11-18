@@ -1,18 +1,12 @@
 package main
 
 import (
-<<<<<<< HEAD
-	//"encoding/json"
-	//"github.com/go-martini/martini"
-	//"github.com/golang/oauth2"
-=======
 	"encoding/json"
 	"github.com/go-martini/martini"
 	"github.com/golang/oauth2"
 	"github.com/golang/oauth2/google"
 	"github.com/martini-contrib/sessions"
 	"io/ioutil"
->>>>>>> 52179a7d6a38c1c9f904c475275d43bf740a9667
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"net/http"
@@ -50,8 +44,6 @@ func UserCreate(db *mgo.Database, gUser GoogleUserV2) (*User, error) {
 
 	return newUser, nil
 }
-<<<<<<< HEAD
-=======
 
 func RequireLogin() martini.Handler {
 	return func(db *mgo.Database, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
@@ -170,4 +162,3 @@ func CreateUserSession(db *mgo.Database, user User, token *oauth2.Token) string 
 
 	return ns.Id.Hex()
 }
->>>>>>> 52179a7d6a38c1c9f904c475275d43bf740a9667
