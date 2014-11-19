@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/golang/oauth2"
 	"github.com/golang/oauth2/google"
@@ -31,7 +32,7 @@ func UserCreate(db *mgo.Database, gUser GoogleUserV2) (*User, error) {
 	newUser.Lastname = gUser.FamilyName
 	newUser.Email = gUser.Email
 	newUser.GoogleId = gUser.Id
-
+	newUser.Picture = gUser.Picture
 	newUser.FirstLogin = time.Now()
 	newUser.LastLogin = time.Now()
 	newUser.Enabled = true
@@ -51,7 +52,6 @@ func RequireLogin() martini.Handler {
 		user_session := db.C(SessionsC)
 		if s.Get("session") != nil {
 			session_id := s.Get("session")
-			print(session_id.(string))
 			u := new(User)
 			ses := new(Session)
 			err := user_session.Find(bson.M{"_id": bson.ObjectIdHex(session_id.(string))}).One(ses)
@@ -70,6 +70,34 @@ func RequireLogin() martini.Handler {
 		} else {
 			http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 		}
+	}
+}
+
+func RequireLoginNoRedirect() martini.Handler {
+	return func(db *mgo.Database, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
+		users := db.C(UsersC)
+		user_session := db.C(SessionsC)
+		var res SimpleResult
+		if s.Get("session") != nil {
+			session_id := s.Get("session")
+			u := new(User)
+			ses := new(Session)
+			err := user_session.Find(bson.M{"_id": bson.ObjectIdHex(session_id.(string))}).One(ses)
+			if err != nil {
+				res.Result = false
+			} else {
+				err = users.FindId(ses.UserId).One(u)
+				if err != nil {
+					res.Result = false
+				} else {
+					res.Result = true
+				}
+			}
+		} else {
+			res.Result = false
+		}
+		b, _ := json.Marshal(res)
+		fmt.Fprint(w, string(b))
 	}
 }
 
@@ -113,6 +141,9 @@ func Oauth2Handler() martini.Handler {
 			case "/o/logout":
 				u := r.URL
 				next := u.Query().Get("next")
+				if next == "" {
+					next = "/"
+				}
 				s.Clear()
 				http.Redirect(w, r, next, 302)
 				break
@@ -175,8 +206,19 @@ func GetUserById(db *mgo.Database, id string) *User {
 
 func InitializeUserService(m *martini.ClassicMartini) {
 	m.Group("/o/user", func(r martini.Router) {
-		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
-			return ""
+		r.Get("/logged_in", RequireLoginNoRedirect())
+		r.Get("/list", RequireLogin(), func(db *mgo.Database) string {
+			var users []User
+			c := db.C(UsersC)
+			c.Find(bson.M{}).All(&users)
+			b, _ := json.Marshal(&users)
+			return string(b)
 		})
+		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
+			u := GetUserById(db, p["id"])
+			b, _ := u.Marshall()
+			return string(b)
+		})
+
 	})
 }

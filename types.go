@@ -2,11 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"time"
 )
 
 type (
+	SimpleResult struct {
+		Result bool `json:"result"`
+	}
 	Role struct {
 		DomainAdmin     bool `bson:"domain_admin"`
 		DomainSetRole   bool `bson:"domain_set_role"`
@@ -144,4 +148,10 @@ type (
 func (u User) Marshall() ([]byte, error) {
 	ret, err := json.Marshal(u)
 	return ret, err
+}
+func (u User) GetAssignedTickets(db *mgo.Database) ([]Ticket, error) {
+	var t []Ticket
+	c := db.C(TicketsC)
+	err := c.Find(bson.M{"assigned_to": u.Id}).All(&t)
+	return t, err
 }
