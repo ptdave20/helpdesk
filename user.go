@@ -56,24 +56,27 @@ func RequireLogin() martini.Handler {
 			ses := new(Session)
 			err := user_session.Find(bson.M{"_id": bson.ObjectIdHex(session_id.(string))}).One(ses)
 			if err != nil {
-				panic(err)
-				//c.Next()
+				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 			}
 			err = users.FindId(ses.UserId).One(u)
 			if err != nil {
-				panic(err)
-				//c.Next()
+				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 			}
-			c.Map(*u)
-			c.Map(*ses)
-			c.Next()
+			if !ses.Expired() {
+				c.Map(*u)
+				c.Map(*ses)
+				c.Next()
+			} else {
+				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
+			}
+
 		} else {
 			http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 		}
 	}
 }
 
-func RequireLoginNoRedirect() martini.Handler {
+func RequireLoginNoRedirectOutResult() martini.Handler {
 	return func(db *mgo.Database, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
 		users := db.C(UsersC)
 		user_session := db.C(SessionsC)
@@ -90,7 +93,11 @@ func RequireLoginNoRedirect() martini.Handler {
 				if err != nil {
 					res.Result = false
 				} else {
-					res.Result = true
+					if ses.Expired() {
+						res.Result = false
+					} else {
+						res.Result = true
+					}
 				}
 			}
 		} else {
@@ -182,12 +189,7 @@ func FindOrCreateUser(db *mgo.Database, google_user GoogleUserV2) *User {
 
 func CreateUserSession(db *mgo.Database, user User, token *oauth2.Token) string {
 	col := db.C(SessionsC)
-	ns := new(Session)
-	ns.Active = true
-	ns.Expires = token.Expiry
-	ns.Refresh = token.RefreshToken
-	ns.Token = token.AccessToken
-	ns.UserId = user.Id
+	var ns = Session{bson.NewObjectId(), user.Id, *token}
 	ns.Id = bson.NewObjectId()
 
 	col.Insert(ns)
@@ -206,7 +208,7 @@ func GetUserById(db *mgo.Database, id string) *User {
 
 func InitializeUserService(m *martini.ClassicMartini) {
 	m.Group("/o/user", func(r martini.Router) {
-		r.Get("/logged_in", RequireLoginNoRedirect())
+		r.Get("/logged_in", RequireLoginNoRedirectOutResult())
 		r.Get("/list", RequireLogin(), func(db *mgo.Database) string {
 			var users []User
 			c := db.C(UsersC)

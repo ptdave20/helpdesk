@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/golang/oauth2"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"time"
@@ -103,12 +104,9 @@ type (
 		Noted      int `bson:"noted"`
 	}
 	Session struct {
-		Id      bson.ObjectId `bson:"_id,omitempty"`
-		UserId  bson.ObjectId `bson:"user_id,omitempty"`
-		Active  bool          `bson:"active"`
-		Token   string        `bson:"token"`
-		Expires time.Time     `bson:"expires"`
-		Refresh string        `bson:"refresh"`
+		Id     bson.ObjectId `bson:"_id,omitempty"`
+		UserId bson.ObjectId `bson:"user_id,omitempty"`
+		oauth2.Token
 	}
 	User struct {
 		Id         bson.ObjectId `bson:"_id,omitempty"`
