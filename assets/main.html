@@ -1,12 +1,45 @@
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-    	<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Helpdesk</title>
-		
-	</head>
-	<body>
-		
-	</body>
+<!doctype html>
+<html lang="en" ng-app="helpIndex">
+<head>
+  <meta charset="utf-8">
+  <title>Helpdesk</title>
+  <link rel="stylesheet" href="scripts/bootstrap/dist/css/bootstrap.css">
+  <script src="/scripts/angular/angular.js"></script>
+  <script src="/scripts/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
+  <script src="/scripts/main.js"></script>
+  <style>
+  	body {
+  		padding-top: 70px;
+  	}
+  	.navbar-fixed-top {
+  		padding-right: 70px;
+  	}
+  </style>
+</head>
+<body ng-controller="bCtrl">
+	<div class="navbar nav navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="navbar-brand">Helpdesk</div>
+		<div class="navbar-right">
+			<a type="button" class="btn btn-primary navbar-btn" href="#" ng-click="newTicket()">Submit a ticket</a>
+			<a type="button" class="btn btn-primary navbar-btn" href="#">Tickets</a>
+			<a type="button" class="btn btn-danger navbar-btn" href="/o/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out</a>
+		</div>
+	</div>
+	<div class="container">
+		<div class="page-header"><h1>Helpdesk</h1></div>
+	</div>
+</body>
+
+	<script type="text/ng-template" id="ticketModal.html">
+		<div>
+			<div class="modal-header"><h3>Submit a Ticket</h3></div>
+			<div class="modal-body">
+
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary">Submit</button>
+				<button class="btn btn-warning">Cancel</button>
+			</div>
+		</div>
+	</script>
 </html>

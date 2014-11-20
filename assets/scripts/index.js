@@ -5,8 +5,9 @@ indexApp.controller('bCtrl', function ($scope,$http) {
 		var j = angular.fromJson(data);
 		console.log(j["result"]);
 		if(j["result"]) {
-			
-			window.location = "/main.html"
+			window.location = "/main.html";
+		} else {
+			// In case we want to directly move them
 		}
 	});
 });
