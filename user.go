@@ -216,6 +216,10 @@ func InitializeUserService(m *martini.ClassicMartini) {
 			b, _ := json.Marshal(&users)
 			return string(b)
 		})
+		r.Get("/me", RequireLogin(), func(u User) string {
+			b, _ := u.Marshall()
+			return string(b)
+		})
 		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
 			u := GetUserById(db, p["id"])
 			b, _ := u.Marshall()

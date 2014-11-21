@@ -28,18 +28,40 @@
 	<div class="container">
 		<div class="page-header"><h1>Helpdesk</h1></div>
 	</div>
-</body>
-
 	<script type="text/ng-template" id="ticketModal.html">
 		<div>
 			<div class="modal-header"><h3>Submit a Ticket</h3></div>
 			<div class="modal-body">
-
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Subject</div>
+					<div class="col-md-8 col-xs-8"><input type="text" class="form-control" ng-model="subject"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Department</div>
+					<div class="col-md-8 col-xs-8"><select class="form-control" ng-model="department"></select></div>
+				</div>
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Category</div>
+					<div class="col-md-8 col-xs-8"><select class="form-control" ng-model="category"></select></div>
+				</div>
+				<hr>
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Uploads</div>
+					<div class="col-md-8 col-xs-8"><input type="file" class="form-control" ng-model="upload"></div>
+				</div>
+				<hr>
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Description</div>
+					<div class="col-md-8 col-xs-8"><textarea class="form-control" ng-model="description"></textarea></div>
+				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary">Submit</button>
-				<button class="btn btn-warning">Cancel</button>
+				<alert type="{{alert.type}}">{{alert.msg}}</alert>
+				<button class="btn btn-primary" ng-click="submit()">Submit</button>
+				<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
 			</div>
 		</div>
 	</script>
+</body>
+
 </html>
