@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/go-martini/martini"
 	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
+	"net/http"
+	"time"
 )
 
 func InitTicketService(m *martini.ClassicMartini) {
@@ -29,8 +33,37 @@ func InitTicketService(m *martini.ClassicMartini) {
 		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			return ""
 		})
-		r.Post("/insert", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-			return ""
+		r.Post("/insert", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
+			println("Trying to add ticket")
+
+			d := json.NewDecoder(req.Body)
+
+			var tkt Ticket
+
+			err := d.Decode(&tkt)
+			if err != nil {
+				panic(err)
+			}
+
+			tkt.Id = bson.NewObjectId()
+			tkt.Submitter = u.Id
+
+			tkt.Created = time.Now()
+			//tkt.Closed = nil
+
+			c := db.C(TicketsC)
+			err = c.Insert(tkt)
+			if err != nil {
+				panic(err)
+			}
+
+			// Move it to json
+			out, err := json.Marshal(&tkt)
+
+			if err != nil {
+				panic(err)
+			}
+			return string(out)
 		})
 	})
 }
@@ -44,6 +77,13 @@ func HandleAssignedTickets(db *mgo.Database, t string) string {
 }
 
 func HandleUserTickets(db *mgo.Database, u User, t string) string {
+	c := db.C(TicketsC)
 
-	return t
+	var tkts []Ticket
+
+	c.Find(bson.M{"submitter": u.Id}).All(&tkts)
+
+	j, _ := json.Marshal(&tkts)
+
+	return string(j)
 }

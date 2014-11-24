@@ -38,7 +38,7 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			return d.Id.Hex()
 		})
 		r.Post("/:id/new_category", RequireLogin(), func(req *http.Request, db *mgo.Database, p martini.Params) string {
-
+			return ""
 		})
 	})
 }

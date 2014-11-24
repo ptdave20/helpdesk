@@ -34,25 +34,37 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Subject</div>
-					<div class="col-md-8 col-xs-8"><input type="text" class="form-control" ng-model="subject"></div>
+					<div class="col-md-8 col-xs-8"><input type="text" class="form-control" ng-model="tkt.subject"></div>
 				</div>
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Department</div>
-					<div class="col-md-8 col-xs-8"><select class="form-control" ng-model="department"></select></div>
+					<div class="col-md-8 col-xs-8">
+						<select class="form-control" ng-model="tkt.department">
+							<option ng-repeat="d in deps" value="{{d.Id}}">
+								{{d.Name}}
+							</option>
+						</select>
+					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Category</div>
-					<div class="col-md-8 col-xs-8"><select class="form-control" ng-model="category"></select></div>
+					<div class="col-md-8 col-xs-8">
+						<select class="form-control" ng-model="tkt.category">
+							<option ng-repeat="c in deps | depCat:tkt.department" value="{{c.Id}}">
+								{{c.Name}}
+							</option>
+						</select>
+					</div>
 				</div>
 				<hr>
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Uploads</div>
-					<div class="col-md-8 col-xs-8"><input type="file" class="form-control" ng-model="upload"></div>
+					<div class="col-md-8 col-xs-8"><input type="file" class="form-control" ng-model="tkt.upload"></div>
 				</div>
 				<hr>
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Description</div>
-					<div class="col-md-8 col-xs-8"><textarea class="form-control" ng-model="description"></textarea></div>
+					<div class="col-md-8 col-xs-8"><textarea class="form-control" ng-model="tkt.description"></textarea></div>
 				</div>
 			</div>
 			<div class="modal-footer">

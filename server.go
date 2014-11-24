@@ -20,6 +20,7 @@ func main() {
 	InitTicketService(m)
 	InitializeUserService(m)
 	InitializeDepartmentService(m)
+	InitTicketService(m)
 
 	m.RunOnAddr(":80")
 
