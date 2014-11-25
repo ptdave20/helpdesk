@@ -21,14 +21,13 @@ func InitTicketService(m *martini.ClassicMartini) {
 				count, _ := c.Find(bson.M{}).Count()
 				return strconv.Itoa(count)
 			})
-			r.Get("/mine", RequireLogin(), func(u User, db *mgo.Database) string {
-				return HandleUserTickets(db, u, "")
+			r.Get("/mine/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+				return HandleUserTickets(db, u, p["status"])
 			})
-			r.Get("/:area/**", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-
+			r.Get("/:area/:id/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 				switch p["area"] {
 				case "department":
-					return HandleDepartmentTickets(db, u, p["_1"])
+					return HandleDepartmentTickets(db, u, p["id"], p["status"])
 					break
 				case "user":
 					return "unimplemented"
@@ -42,8 +41,6 @@ func InitTicketService(m *martini.ClassicMartini) {
 			return ""
 		})
 		r.Post("/insert", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
-			println("Trying to add ticket")
-
 			d := json.NewDecoder(req.Body)
 
 			var tkt Ticket
@@ -55,6 +52,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 
 			tkt.Id = bson.NewObjectId()
 			tkt.Submitter = u.Id
+			tkt.Status = "open"
 
 			tkt.Created = time.Now()
 			//tkt.Closed = nil
@@ -76,9 +74,8 @@ func InitTicketService(m *martini.ClassicMartini) {
 	})
 }
 
-func HandleDepartmentTickets(db *mgo.Database, u User, t string) string {
+func HandleDepartmentTickets(db *mgo.Database, u User, t string, s string) string {
 	allow := false
-	println(t)
 	for i := 0; i < len(u.Department); i++ {
 		if u.Department[i].Hex() == t {
 			allow = true
@@ -93,8 +90,15 @@ func HandleDepartmentTickets(db *mgo.Database, u User, t string) string {
 	if allow {
 		c := db.C(TicketsC)
 		var tickets []Ticket
-		c.Find(bson.M{"department": bson.ObjectIdHex(t)}).All(&tickets)
-
+		if s != "closed" {
+			c.Find(bson.M{"department": bson.ObjectIdHex(t), "status": bson.M{"$ne": "closed"}}).All(&tickets)
+		} else {
+			if s == "all" {
+				c.Find(bson.M{"department": bson.ObjectIdHex(t)}).All(&tickets)
+			} else {
+				c.Find(bson.M{"department": bson.ObjectIdHex(t), "status": "closed"}).All(&tickets)
+			}
+		}
 		b, _ := json.Marshal(&tickets)
 		return string(b)
 	}
@@ -110,7 +114,14 @@ func HandleUserTickets(db *mgo.Database, u User, t string) string {
 
 	var tkts []Ticket
 
-	c.Find(bson.M{"submitter": u.Id}).All(&tkts)
+	if t != "closed" {
+		c.Find(bson.M{"submitter": u.Id, "status": bson.M{"$ne": "closed"}}).All(&tkts)
+
+	} else if t == "all" {
+		c.Find(bson.M{"submitter": u.Id}).All(&tkts)
+	} else if t == "closed" {
+		c.Find(bson.M{"submitter": u.Id, "status": "closed"}).All(&tkts)
+	}
 
 	j, _ := json.Marshal(&tkts)
 

@@ -54,9 +54,10 @@ type (
 		KeepStats      bool          `bson:"keep_user_stats"`
 	}
 	Domain struct {
-		Id        bson.ObjectId `bson:"_id"`
-		Name      string        `bson:"domain"`
-		Buildings []Building    `bson:"buildings"`
+		Id          bson.ObjectId   `bson:"_id"`
+		Name        string          `bson:"domain"`
+		Buildings   []Building      `bson:"buildings"`
+		Departments []bson.ObjectId `bson:"departments"`
 	}
 	Note struct {
 		Id        bson.ObjectId `bson:"_id"`
@@ -84,8 +85,8 @@ type (
 		Mime      string        `bson:"mime"`
 	}
 	TicketStatus struct {
-		Id   int    `bson:"_id"`
-		Name string `bson:"name"`
+		Value string `bson:"value"`
+		Name  string `bson:"name"`
 	}
 	Ticket struct {
 		Id         bson.ObjectId `bson:"_id"`
@@ -98,7 +99,7 @@ type (
 		Subject    string        `bson:"subject"`
 		Created    time.Time     `bson:"created"`
 		Closed     time.Time     `bson:"closed"`
-		Status     bson.ObjectId `bson:"status,omitempty"`
+		Status     string        `bson:"status,omitempty"`
 		Duration   time.Duration `bson:"duration"`
 		Notes      []Note        `bson:"notes"`
 		Documents  []Document    `bson:"document"`

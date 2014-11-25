@@ -21,20 +21,34 @@
 	<div class="navbar nav navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="navbar-brand">Helpdesk</div>
 		<div class="navbar-right">
-			<a type="button" class="btn btn-primary navbar-btn" href="#" ng-click="newTicket()">Submit a ticket</a>
+			<a type="button" class="btn btn-primary navbar-btn" href="#" ng-click="newTicket()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New ticket</a>
 			<a type="button" class="btn btn-danger navbar-btn" href="/o/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out</a>
 		</div>
 	</div>
 	<div class="container">
-		<div class="page-header"><h1>Helpdesk</h1></div>
 		<tabset>
-			<tab heading="My Submissions">
+			<tab>
+				<tab-heading>
+					Submissions
+				</tab-heading>
+				<nav class="navbar navbar-default">
+					<form class="navbar-form navbar-left">
+						<select class="form-control" ng-model="selDepartment">
+							<option ng-repeat="department in me.Department" value="{{department}}">	
+								{{department | depName:this}}
+							</option>
+						</select>
+					</form>
+					<button type="button" class="btn btn-default navbar-btn" ng-click="viewSubmitterOpen()">Open</button>
+					<button type="button" class="btn btn-default navbar-btn" ng-click="viewSubmitterClosed()">Closed</button>
+				</nav>
 				<table class="table table-hover">
 					<thead>
 						<th>Subject</th>
 						<th>Created On</th>
 						<th>Department</th>
 						<th>Category</th>
+						<th>Status</th>
 					</thead>
 					<tbody>
 						<tr ng-repeat="ticket in submitted">
@@ -42,12 +56,50 @@
 							<td>{{ticket.Created | date : 'short'}}</td>
 							<td>{{ticket.Department | depFilter : departments}}</td>
 							<td>{{ticket.Category}}</td>
+							<td>
+								<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
+								<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</tab>
-			<tab heading="Department Tickets">
-
+			<tab ng-if="me.Department.length > 0">
+				<tab-heading>
+					Departments
+				</tab-heading>
+				<nav class="navbar navbar-default">
+					<form class="navbar-form navbar-left">
+						<select class="form-control" ng-model="selDepartment" ng-change="getDepTickets()">
+							<option ng-repeat="department in me.Department" value="{{department}}">	
+								{{department | depName:this}}
+							</option>
+						</select>
+					</form>
+					<button type="button" class="btn btn-default navbar-btn" ng-click="viewDepartmentOpen()">Open</button>
+					<button type="button" class="btn btn-default navbar-btn" ng-click="viewDepartmentClosed()">Closed</button>
+				</nav>
+				<table class="table table-hover">
+					<thead>
+						<th>Subject</th>
+						<th>Created On</th>
+						<th>Department</th>
+						<th>Category</th>
+						<th>Status</th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="ticket in department">
+							<td>{{ticket.Subject}}</td>
+							<td>{{ticket.Created | date : 'short'}}</td>
+							<td>{{ticket.Department | depFilter : departments}}</td>
+							<td>{{ticket.Category}}</td>
+							<td>
+								<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
+								<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</tab>
 			<tab heading="Assigned Tickets"></tab>
 		</tabset>

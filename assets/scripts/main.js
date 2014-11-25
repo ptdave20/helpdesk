@@ -7,29 +7,82 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	$scope.assigned = [];
 	$scope.department = [];
 	$scope.departments = [];
+	$scope.ticketSubmitterStatus = "open";
+	$scope.ticketDepartmentStatus = "open";
+
+	$scope.selDepartment = null;
 
 	$http.get('/o/user/me',{withCredentials:true}).success(function(data) {
 		var j = angular.fromJson(data);
 		$scope.me = j;
+
+		if($scope.me.Department.length == 0) {
+			$scope.selDepartment = null;
+		} else {
+			$scope.selDepartment = $scope.me.Department[0];
+		}
+		$scope.getSubmittedTickets();
+		$scope.getDepTickets();
+
 	});
 
-	$http.get('/o/ticket/list/mine',{withCredentials:true}).success(function(data) {
-		var j = angular.fromJson(data);
-		$scope.submitted = j;
-	});
+	$scope.viewSubmitterOpen = function() {
+		$scope.ticketSubmitterStatus = "open";
+		$scope.getSubmittedTickets();
+		$scope.getDepTickets();
+	}
+
+	$scope.viewSubmitterClosed = function() {
+		$scope.ticketSubmitterStatus = "closed";
+		$scope.getSubmittedTickets();
+		$scope.getDepTickets();
+	}
+
+	$scope.viewDepartmentOpen = function() {
+		$scope.ticketDepartmentStatus = "open";
+		$scope.getSubmittedTickets();
+		$scope.getDepTickets();
+	}
+
+	$scope.viewDepartmentClosed = function() {
+		$scope.ticketDepartmentStatus = "closed";
+		$scope.getSubmittedTickets();
+		$scope.getDepTickets();
+	}
+
+	$scope.getSubmittedTickets = function() {
+		$http.get('/o/ticket/list/mine/'+$scope.ticketSubmitterStatus,{withCredentials:true}).success(function(data) {
+			var j = angular.fromJson(data);
+			$scope.submitted = j;
+		});
+	}
+
+	$scope.getDepTickets = function() {
+		// If we don't have a department, then return
+		if($scope.selDepartment == undefined || $scope.selDepartment == null) {
+			return;
+		}
+		$http.get('/o/ticket/list/department/'+$scope.selDepartment+"/"+$scope.ticketDepartmentStatus,{withCredentials:true}).success(function(data) {
+			var j = angular.fromJson(data);
+			$scope.department = j;
+		});
+	}
+	
 
 	$http.get('/o/departments/list',{withCredentials:true}).success(function(data) {
 		var j = angular.fromJson(data);
 		$scope.departments = j;
 	});
 
-	$interval(function() {
-		$http.get('/o/ticket/list/mine',{withCredentials:true}).success(function(data) {
-			console.log("Running");
-			var j = angular.fromJson(data);
-			$scope.submitted = j;
-		});
-	}, 5000);
+	$scope.bg = $interval(function() {
+		// Reget your submitted tickets
+		$scope.getSubmittedTickets()
+
+		// Reget your department tickets
+		$scope.getDepTickets();
+	}, 30000);
+
+	
 
 	$scope.newTicket = function() {
 		var modalInstance = $modal.open({
@@ -47,6 +100,18 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 				});
 			}
 		});
+	}
+});
+
+angular.module('helpIndex').filter('depName', function() {
+	return function(input,scope) {
+		if(scope.departments == undefined)
+			return "Unknown";
+		for(var i=0; i<scope.departments.length; i++) {
+			if(scope.departments[i].Id == input)
+				return scope.departments[i].Name;
+		}
+		return "Unknown"
 	}
 });
 
