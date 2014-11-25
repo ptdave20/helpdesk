@@ -27,6 +27,20 @@
 	</div>
 	<div class="container">
 		<div class="page-header"><h1>Helpdesk</h1></div>
+		<table class="table table-hover">
+			<thead>
+				<th>Subject</th>
+				<th>Created On</th>
+				<th>Department</th>
+			</thead>
+			<tbody>
+				<tr ng-repeat="ticket in submitted">
+					<td>{{ticket.Subject}}</td>
+					<td>{{ticket.Created | date : 'short'}}</td>
+					<td>{{ticket.Department | depFilter : departments}}</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 	<script type="text/ng-template" id="ticketModal.html">
 		<div>

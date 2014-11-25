@@ -6,13 +6,22 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal) {
 	$scope.submitted = [];
 	$scope.assigned = [];
 	$scope.department = [];
+	$scope.departments = [];
 
 	$http.get('/o/user/me',{withCredentials:true}).success(function(data) {
 		var j = angular.fromJson(data);
 		$scope.me = j;
 	});
 
+	$http.get('/o/ticket/list/mine',{withCredentials:true}).success(function(data) {
+		var j = angular.fromJson(data);
+		$scope.submitted = j;
+	});
 
+	$http.get('/o/departments/list',{withCredentials:true}).success(function(data) {
+		var j = angular.fromJson(data);
+		$scope.departments = j;
+	});
 
 	$scope.newTicket = function() {
 		var modalInstance = $modal.open({
@@ -24,6 +33,10 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal) {
 		modalInstance.result.then(function(data) {
 			if(data) {
 				// Reget our list of tickets
+				$http.get('/o/ticket/list/mine',{withCredentials:true}).success(function(data) {
+					var j = angular.fromJson(data);
+					$scope.submitted = j;
+				});
 			}
 		});
 	}
@@ -41,6 +54,18 @@ angular.module('helpIndex').filter('depCat', function() {
 		}
 
 		return out;
+	}
+});
+
+
+angular.module('helpIndex').filter('depFilter', function() {
+	return function(id,data) {
+		for(var i=0; i<data.length; i++) {
+			if(data[i].Id == id) {
+				return data[i].Name;
+			}
+		}
+		return "Unknown";
 	}
 });
 
