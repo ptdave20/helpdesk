@@ -22,6 +22,7 @@ const (
 	UsersC          string = "users"
 	SessionsC       string = "sessions"
 	TicketsC        string = "tickets"
+	TicketStatusC   string = "status"
 	DomainsC        string = "domains"
 	DepartmentsC    string = "departments"
 	DocumentC       string = "documents"

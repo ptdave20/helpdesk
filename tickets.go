@@ -6,6 +6,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -15,13 +16,19 @@ func InitTicketService(m *martini.ClassicMartini) {
 			return params["id"]
 		})
 		r.Group("/list", func(r martini.Router) {
-			r.Get("/**", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-				switch p["_1"] {
+			r.Get("/total_count", RequireLogin(), func(db *mgo.Database) string {
+				c := db.C(TicketsC)
+				count, _ := c.Find(bson.M{}).Count()
+				return strconv.Itoa(count)
+			})
+			r.Get("/mine", RequireLogin(), func(u User, db *mgo.Database) string {
+				return HandleUserTickets(db, u, "")
+			})
+			r.Get("/:area/**", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+
+				switch p["area"] {
 				case "department":
-					return HandleDepartmentTickets(db, p["_2"])
-					break
-				case "mine":
-					return HandleUserTickets(db, u, p["_2"])
+					return HandleDepartmentTickets(db, u, p["_1"])
 					break
 				case "user":
 					return "unimplemented"
@@ -30,6 +37,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 				return ""
 			})
 		})
+
 		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			return ""
 		})
@@ -68,8 +76,29 @@ func InitTicketService(m *martini.ClassicMartini) {
 	})
 }
 
-func HandleDepartmentTickets(db *mgo.Database, t string) string {
-	return t
+func HandleDepartmentTickets(db *mgo.Database, u User, t string) string {
+	allow := false
+	println(t)
+	for i := 0; i < len(u.Department); i++ {
+		if u.Department[i].Hex() == t {
+			allow = true
+			break
+		}
+	}
+
+	if u.Roles.DomainAdmin {
+		allow = true
+	}
+
+	if allow {
+		c := db.C(TicketsC)
+		var tickets []Ticket
+		c.Find(bson.M{"department": bson.ObjectIdHex(t)}).All(&tickets)
+
+		b, _ := json.Marshal(&tickets)
+		return string(b)
+	}
+	return "error"
 }
 
 func HandleAssignedTickets(db *mgo.Database, t string) string {

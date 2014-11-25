@@ -12,6 +12,10 @@ type (
 	SimpleResult struct {
 		Result bool `json:"result"`
 	}
+	Group struct {
+		Id      bson.ObjectId   `bson:"_id"`
+		Members []bson.ObjectId `bson:"members"`
+	}
 	Role struct {
 		DomainAdmin     bool `bson:"domain_admin"`
 		DomainSetRole   bool `bson:"domain_set_role"`
@@ -66,11 +70,13 @@ type (
 		Name string        `bson:"name"`
 	}
 	Department struct {
-		Id       bson.ObjectId `bson:"_id"`
-		Name     string        `bson:"name"`
-		Category []Category    `bson:"category"`
+		Id               bson.ObjectId `bson:"_id"`
+		Name             string        `bson:"name"`
+		Category         []Category    `bson:"category,omitempty"`
+		BuildingSpecific bson.ObjectId `bson:"visible_to,omitempty"`
 	}
 	Document struct {
+		Id        bson.ObjectId `bson:"_id"`
 		Created   time.Time     `bson:"created"`
 		Submitter bson.ObjectId `bson:"submitter"`
 		Name      string        `bson:"name"`
@@ -78,8 +84,8 @@ type (
 		Mime      string        `bson:"mime"`
 	}
 	TicketStatus struct {
-		Id   bson.ObjectId `bson:"_id"`
-		Name string        `bson:"name"`
+		Id   int    `bson:"_id"`
+		Name string `bson:"name"`
 	}
 	Ticket struct {
 		Id         bson.ObjectId `bson:"_id"`
@@ -147,7 +153,7 @@ type (
 	}
 )
 
-func (u User) Marshall() ([]byte, error) {
+func (u User) Marshal() ([]byte, error) {
 	ret, err := json.Marshal(u)
 	return ret, err
 }

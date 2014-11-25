@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Helpdesk</title>
   <link rel="stylesheet" href="scripts/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="style.css">
   <script src="/scripts/angular/angular.js"></script>
   <script src="/scripts/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
   <script src="/scripts/main.js"></script>
@@ -21,27 +22,38 @@
 		<div class="navbar-brand">Helpdesk</div>
 		<div class="navbar-right">
 			<a type="button" class="btn btn-primary navbar-btn" href="#" ng-click="newTicket()">Submit a ticket</a>
-			<a type="button" class="btn btn-primary navbar-btn" href="#">Tickets</a>
 			<a type="button" class="btn btn-danger navbar-btn" href="/o/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out</a>
 		</div>
 	</div>
 	<div class="container">
 		<div class="page-header"><h1>Helpdesk</h1></div>
-		<table class="table table-hover">
-			<thead>
-				<th>Subject</th>
-				<th>Created On</th>
-				<th>Department</th>
-			</thead>
-			<tbody>
-				<tr ng-repeat="ticket in submitted">
-					<td>{{ticket.Subject}}</td>
-					<td>{{ticket.Created | date : 'short'}}</td>
-					<td>{{ticket.Department | depFilter : departments}}</td>
-				</tr>
-			</tbody>
-		</table>
+		<tabset>
+			<tab heading="My Submissions">
+				<table class="table table-hover">
+					<thead>
+						<th>Subject</th>
+						<th>Created On</th>
+						<th>Department</th>
+						<th>Category</th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="ticket in submitted">
+							<td>{{ticket.Subject}}</td>
+							<td>{{ticket.Created | date : 'short'}}</td>
+							<td>{{ticket.Department | depFilter : departments}}</td>
+							<td>{{ticket.Category}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</tab>
+			<tab heading="Department Tickets">
+
+			</tab>
+			<tab heading="Assigned Tickets"></tab>
+		</tabset>
+		
 	</div>
+
 	<script type="text/ng-template" id="ticketModal.html">
 		<div>
 			<div class="modal-header"><h3>Submit a Ticket</h3></div>

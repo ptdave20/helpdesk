@@ -217,7 +217,7 @@ func InitializeUserService(m *martini.ClassicMartini) {
 			return string(b)
 		})
 		r.Get("/me", RequireLogin(), func(u User) string {
-			b, err := u.Marshall()
+			b, err := u.Marshal()
 			if err != nil {
 				panic(err)
 			}
@@ -225,7 +225,7 @@ func InitializeUserService(m *martini.ClassicMartini) {
 		})
 		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
 			u := GetUserById(db, p["id"])
-			b, _ := u.Marshall()
+			b, _ := u.Marshal()
 			return string(b)
 		})
 

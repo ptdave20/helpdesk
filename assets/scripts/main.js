@@ -1,8 +1,8 @@
-angular.module('helpIndex',['ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap.alert'])
+angular.module('helpIndex',['ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap'])
 
 
 
-angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal) {
+angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval) {
 	$scope.submitted = [];
 	$scope.assigned = [];
 	$scope.department = [];
@@ -22,6 +22,14 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal) {
 		var j = angular.fromJson(data);
 		$scope.departments = j;
 	});
+
+	$interval(function() {
+		$http.get('/o/ticket/list/mine',{withCredentials:true}).success(function(data) {
+			console.log("Running");
+			var j = angular.fromJson(data);
+			$scope.submitted = j;
+		});
+	}, 5000);
 
 	$scope.newTicket = function() {
 		var modalInstance = $modal.open({
