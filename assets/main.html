@@ -40,7 +40,7 @@
 					    </div>
 					</div>
 				</nav>
-				<table class="table table-hover">
+				<table class="table table-hover" ng-show="submittedHasTickets">
 					<thead>
 						<td>&nbsp;</td>
 						<th>Subject</th>
@@ -63,6 +63,7 @@
 						</tr>
 					</tbody>
 				</table>
+				<h3 ng-hide="submittedHasTickets"><center>No tickets</center></h3>
 			</tab>
 			<tab ng-if="me.Department.length > 0">
 				<tab-heading>

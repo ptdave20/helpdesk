@@ -9,6 +9,10 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	$scope.departments = [];
 	$scope.ticketSubmitterStatus = "open";
 	$scope.ticketDepartmentStatus = "open";
+	$scope.submittedHasTickets = false;
+	$scope.assignedHasTickets = false;
+	$scope.departmentHasTickets = false;
+
 
 	$scope.selDepartment = null;
 
@@ -16,7 +20,9 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		var j = angular.fromJson(data);
 		$scope.me = j;
 
-		if($scope.me.Department.length == 0) {
+		$scope.me.Department = $scope.me.Department || [];
+
+		if($scope.me.Department!=null || $scope.me.Department.length == 0) {
 			$scope.selDepartment = null;
 		} else {
 			$scope.selDepartment = $scope.me.Department[0];
@@ -49,7 +55,13 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	$scope.getSubmittedTickets = function() {
 		$http.get('/o/ticket/list/mine/'+$scope.ticketSubmitterStatus,{withCredentials:true}).success(function(data) {
 			var j = angular.fromJson(data);
+			j = j || [];
 			$scope.submitted = j;
+			if($scope.submitted.length > 0) {
+				$scope.submittedHasTickets = true;
+			} else {
+				$scope.submittedHasTickets = false;
+			}
 		});
 	}
 
@@ -70,6 +82,12 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		$http.get('/o/ticket/list/department/'+$scope.selDepartment+"/"+$scope.ticketDepartmentStatus,{withCredentials:true}).success(function(data) {
 			var j = angular.fromJson(data);
 			$scope.department = j;
+			if($scope.department.length > 0) {
+				$scope.departmentHasTickets = true;
+			} else {
+				$scope.departmentHasTickets = false;
+			}
+
 		});
 	}
 	
