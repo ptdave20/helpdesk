@@ -32,6 +32,10 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 
 	});
 
+	$scope.openTicket = function(id) {
+		console.log(id);
+	}
+
 	$scope.viewSubmitterOpen = function() {
 		$scope.ticketSubmitterStatus = "open";
 		$scope.getSubmittedTickets();
@@ -109,7 +113,7 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 
 	$scope.newTicket = function() {
 		var modalInstance = $modal.open({
-			templateUrl: 'ticketModal.html',
+			templateUrl: 'ticketSubmitModal.html',
 			controller: 'newTicketCtrl',
 			backdrop: 'static'
 		});
@@ -181,6 +185,16 @@ angular.module('helpIndex').filter('depFilter', function() {
 		}
 		return "Unknown";
 	}
+});
+
+angular.module('helpIndex').controller('ticketModal', function($scope,$http,$modalInstance) {
+	$http.get('/o/departments/list',
+			{
+				withCredentials:true
+			})
+	.success(function(data) {
+		$scope.deps = angular.fromJson(data);
+	});
 });
 
 angular.module('helpIndex').controller('newTicketCtrl', function($scope,$http,$modalInstance) {

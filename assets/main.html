@@ -60,6 +60,7 @@
 								<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
 								<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
 							</td>
+							<td><button ng-click="openTicket(ticket.Id)">Open</button></td>
 						</tr>
 					</tbody>
 				</table>
@@ -113,8 +114,22 @@
 		</tabset>
 		
 	</div>
-
-	<script type="text/ng-template" id="ticketModal.html">
+	<script type="text/ng-template" id="ticketViewModal.html">
+		<div>
+			<div class="modal-header">
+				<h3>Helpdesk Ticket</h3>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Subject</div>
+					<div class="col-md-8 col-xs-8"><input type="text" class="form-control" ng-model="tkt.subject">
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer"></div>
+		</div>
+	</script>
+	<script type="text/ng-template" id="ticketSubmitModal.html">
 		<div>
 			<div class="modal-header"><h3>Submit a Ticket</h3></div>
 			<div class="modal-body">
