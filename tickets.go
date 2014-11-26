@@ -40,6 +40,57 @@ func InitTicketService(m *martini.ClassicMartini) {
 		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			return ""
 		})
+		r.Post("/close/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			var id string = p["id"]
+			var tkt Ticket
+
+			c := db.C(TicketsC)
+			err := c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&tkt)
+			if err != nil {
+				panic(err)
+			}
+
+			var allow bool = false
+
+			// Check to see if the user is allowed to close this based on ownership
+			if u.Id.Hex() == tkt.Submitter.Hex() {
+				allow = true
+			}
+
+			// Check to see if the user is allowed to close this based on assignment
+			if u.Id.Hex() == tkt.AssignedTo.Hex() {
+				allow = true
+			}
+
+			// Check to see if the user is allowed to close this based on department
+			for i := 0; i < len(u.Department); i++ {
+				if u.Department[i].Hex() == tkt.Department.Hex() {
+					if u.Roles.DepAdmin || u.Roles.DepCloseTicket {
+						allow = true
+						break
+					}
+				}
+			}
+
+			// Check to see if the user is allowed to close this based on
+			if u.Roles.DomainAdmin {
+				allow = true
+			}
+
+			var res SimpleResult
+			if allow {
+				err := c.Update(bson.M{"_id": tkt.Id}, bson.M{"closed": time.Now(), "status": "closed"})
+				if err != nil {
+					panic(err)
+				}
+				res.Result = true
+			} else {
+				res.Result = false
+			}
+
+			b, _ := json.Marshal(res)
+			return string(b)
+		})
 		r.Post("/insert", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
 			d := json.NewDecoder(req.Body)
 

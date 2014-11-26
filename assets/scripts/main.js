@@ -29,24 +29,20 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	$scope.viewSubmitterOpen = function() {
 		$scope.ticketSubmitterStatus = "open";
 		$scope.getSubmittedTickets();
-		$scope.getDepTickets();
 	}
 
 	$scope.viewSubmitterClosed = function() {
 		$scope.ticketSubmitterStatus = "closed";
 		$scope.getSubmittedTickets();
-		$scope.getDepTickets();
 	}
 
 	$scope.viewDepartmentOpen = function() {
 		$scope.ticketDepartmentStatus = "open";
-		$scope.getSubmittedTickets();
 		$scope.getDepTickets();
 	}
 
 	$scope.viewDepartmentClosed = function() {
 		$scope.ticketDepartmentStatus = "closed";
-		$scope.getSubmittedTickets();
 		$scope.getDepTickets();
 	}
 
@@ -54,6 +50,15 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		$http.get('/o/ticket/list/mine/'+$scope.ticketSubmitterStatus,{withCredentials:true}).success(function(data) {
 			var j = angular.fromJson(data);
 			$scope.submitted = j;
+		});
+	}
+
+	$scope.closeTicket = function(id) {
+		$http.post('/o/ticket/close/'+id,{withCredentials:true}).success(function(data){
+			var j = angular.fromJson(data);
+			if(j["result"]) {
+				// Success!
+			}
 		});
 	}
 
@@ -130,6 +135,24 @@ angular.module('helpIndex').filter('depCat', function() {
 	}
 });
 
+angular.module('helpIndex').filter('search', function() {
+	return function(input,data) {
+		input = input || "";
+		data = data || [];
+
+		if(input == "") {
+			return data;
+		}
+
+		var out = [];
+		for(var i = 0; i<data.length; i++) {
+			if(data[i].Subject.indexOf(input) > -1) {
+				out.append(data[i]);
+			}
+		}
+		return out;
+	}
+});
 
 angular.module('helpIndex').filter('depFilter', function() {
 	return function(id,data) {

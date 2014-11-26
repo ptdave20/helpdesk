@@ -32,18 +32,17 @@
 					Submissions
 				</tab-heading>
 				<nav class="navbar navbar-default">
-					<form class="navbar-form navbar-left">
-						<select class="form-control" ng-model="selDepartment">
-							<option ng-repeat="department in me.Department" value="{{department}}">	
-								{{department | depName:this}}
-							</option>
-						</select>
-					</form>
-					<button type="button" class="btn btn-default navbar-btn" ng-click="viewSubmitterOpen()">Open</button>
-					<button type="button" class="btn btn-default navbar-btn" ng-click="viewSubmitterClosed()">Closed</button>
+					<p class="navbar-text">View:</p>
+					<div class="navbar-btn">
+						<div class="btn-group">
+					        <label class="btn btn-success" ng-model="ticketSubmitterStatus" btn-radio="'open'" ng-click="viewSubmitterOpen()" uncheckable>Open</label>
+					        <label class="btn btn-success" ng-model="ticketSubmitterStatus" btn-radio="'closed'" ng-click="viewSubmitterClosed()" uncheckable>Closed</label>
+					    </div>
+					</div>
 				</nav>
 				<table class="table table-hover">
 					<thead>
+						<td>&nbsp;</td>
 						<th>Subject</th>
 						<th>Created On</th>
 						<th>Department</th>
@@ -52,6 +51,7 @@
 					</thead>
 					<tbody>
 						<tr ng-repeat="ticket in submitted">
+							<td><input type="checkbox"></td>
 							<td>{{ticket.Subject}}</td>
 							<td>{{ticket.Created | date : 'short'}}</td>
 							<td>{{ticket.Department | depFilter : departments}}</td>
@@ -69,18 +69,24 @@
 					Departments
 				</tab-heading>
 				<nav class="navbar navbar-default">
-					<form class="navbar-form navbar-left">
+					<p class="navbar-text">View:</p>
+					<div class="navbar-btn">
+						<div class="btn-group">
+					        <label class="btn btn-success" ng-model="ticketDepartmentStatus" btn-radio="'open'" ng-click="viewDepartmentOpen()" uncheckable>Open</label>
+					        <label class="btn btn-success" ng-model="ticketDepartmentStatus" btn-radio="'closed'" ng-click="viewDepartmentClosed()" uncheckable>Closed</label>
+					    </div>
+					</div>
+					<form class="navbar-form">
 						<select class="form-control" ng-model="selDepartment" ng-change="getDepTickets()">
 							<option ng-repeat="department in me.Department" value="{{department}}">	
 								{{department | depName:this}}
 							</option>
 						</select>
 					</form>
-					<button type="button" class="btn btn-default navbar-btn" ng-click="viewDepartmentOpen()">Open</button>
-					<button type="button" class="btn btn-default navbar-btn" ng-click="viewDepartmentClosed()">Closed</button>
 				</nav>
 				<table class="table table-hover">
 					<thead>
+						<td>&nbsp;</td>
 						<th>Subject</th>
 						<th>Created On</th>
 						<th>Department</th>
@@ -89,6 +95,7 @@
 					</thead>
 					<tbody>
 						<tr ng-repeat="ticket in department">
+							<td><input type="checkbox"></td>
 							<td>{{ticket.Subject}}</td>
 							<td>{{ticket.Created | date : 'short'}}</td>
 							<td>{{ticket.Department | depFilter : departments}}</td>
