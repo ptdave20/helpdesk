@@ -32,8 +32,66 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 
 	});
 
-	$scope.openTicket = function(id) {
-		console.log(id);
+	$scope.openTicket = function(ticketData) {
+		var modalInstance = $modal.open({
+			templateUrl: 'ticketViewModal.html',
+			controller: 'ticketModal',
+			backdrop: 'static',
+			resolve: {
+				ticket: function() {
+					return ticketData;
+				},
+				departments: function() {
+					return $scope.departments;
+				},
+				options: function() {
+					return {
+						newTicket: false,
+						canEdit: ticketData.Status != "closed",
+						canClose: ticketData.Status != "closed"
+					}
+				}
+			}
+		});
+
+		modalInstance.result.then(function(data) {
+			if(data) {
+				// Reget our list of tickets
+				$scope.getSubmittedTickets();
+				$scope.getDepTickets();
+			}
+		});
+	}
+
+	$scope.newTicket = function() {
+		var modalInstance = $modal.open({
+			templateUrl: 'ticketViewModal.html',
+			controller: 'ticketModal',
+			backdrop: 'static',
+			resolve: {
+				ticket: function() {
+					return {};
+				},
+				departments: function() {
+					return $scope.departments;
+				},
+				options: function() {
+					return {
+						newTicket: true,
+						canEdit: true,
+						canClose: false
+					}
+				}
+			}
+		});
+
+		modalInstance.result.then(function(data) {
+			if(data) {
+				// Reget our list of tickets
+				$scope.getSubmittedTickets();
+				$scope.getDepTickets();
+			}
+		});
 	}
 
 	$scope.viewSubmitterOpen = function() {
@@ -111,23 +169,7 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 
 	
 
-	$scope.newTicket = function() {
-		var modalInstance = $modal.open({
-			templateUrl: 'ticketSubmitModal.html',
-			controller: 'newTicketCtrl',
-			backdrop: 'static'
-		});
 
-		modalInstance.result.then(function(data) {
-			if(data) {
-				// Reget our list of tickets
-				$http.get('/o/ticket/list/mine',{withCredentials:true}).success(function(data) {
-					var j = angular.fromJson(data);
-					$scope.submitted = j;
-				});
-			}
-		});
-	}
 });
 
 angular.module('helpIndex').filter('depName', function() {
@@ -187,14 +229,60 @@ angular.module('helpIndex').filter('depFilter', function() {
 	}
 });
 
-angular.module('helpIndex').controller('ticketModal', function($scope,$http,$modalInstance) {
-	$http.get('/o/departments/list',
+angular.module('helpIndex').controller('ticketModal', function($scope,$http,$modalInstance,ticket,departments,options) {
+	$scope.ticket = ticket;
+	$scope.departments = departments;
+	$scope.categories = [];
+	$scope.options = options;
+
+	$scope.DepCatChange = function() {
+		for(var d=0; d<$scope.departments.length; d++) {
+			if($scope.departments[d].Id == $scope.ticket.Department) {
+				// Set the uneditable value
+				$scope.departmentName = $scope.departments[d].Name;
+				
+				// Set the editable categories
+				$scope.categories = $scope.departments[d].Category;
+
+				// Set the uneditable category value
+				for(var c=0; c<$scope.departments[d].Category.length; c++) {
+					if($scope.departments[d].Category[c].Id == $scope.ticket.Category) {
+						$scope.categoryName = $scope.departments[d].Category[c].Name;
+					}
+				}
+			}
+		}
+	}
+
+	$scope.update = function() {
+
+	}
+
+	$scope.submit = function() {
+		if(!$scope.options.newTicket)
+			return;
+		$http.post(
+			'/o/ticket/insert',
+			$scope.tkt,
 			{
-				withCredentials:true
-			})
-	.success(function(data) {
-		$scope.deps = angular.fromJson(data);
-	});
+				withCredentials:true,
+				headers: { 
+					'Content-Type': 'application/json',
+				}
+			}
+		).success(function(data) {
+			j = angular.fromJson(data);
+
+			if(j["Id"]!=null || j["Id"]!=undefined) {
+				$modalInstance.close(true);	
+			}
+		});
+	}
+	$scope.cancel = function() {
+		$modalInstance.dismiss();
+	}
+	$scope.DepCatChange();
+	
 });
 
 angular.module('helpIndex').controller('newTicketCtrl', function($scope,$http,$modalInstance) {

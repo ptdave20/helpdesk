@@ -60,7 +60,7 @@
 								<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
 								<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
 							</td>
-							<td><button ng-click="openTicket(ticket.Id)">Open</button></td>
+							<td><button ng-click="openTicket(ticket)">Open</button></td>
 						</tr>
 					</tbody>
 				</table>
@@ -122,26 +122,21 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Subject</div>
-					<div class="col-md-8 col-xs-8"><input type="text" class="form-control" ng-model="tkt.subject">
+					<div class="col-md-8 col-xs-8">
+						<div class="well well-sm" ng-hide="options.canEdit">
+							{{ticket.Subject}}
+						</div>
+						<input type="text" class="form-control" ng-model="ticket.Subject" ng-show="options.canEdit">
 					</div>
-				</div>
-			</div>
-			<div class="modal-footer"></div>
-		</div>
-	</script>
-	<script type="text/ng-template" id="ticketSubmitModal.html">
-		<div>
-			<div class="modal-header"><h3>Submit a Ticket</h3></div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-md-3 col-xs-4">Subject</div>
-					<div class="col-md-8 col-xs-8"><input type="text" class="form-control" ng-model="tkt.subject"></div>
 				</div>
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Department</div>
 					<div class="col-md-8 col-xs-8">
-						<select class="form-control" ng-model="tkt.department">
-							<option ng-repeat="d in deps" value="{{d.Id}}">
+						<div class="well well-sm" ng-hide="options.canEdit">
+							{{departmentName}}
+						</div>
+						<select class="form-control" ng-model="ticket.Department" ng-show="options.canEdit" ng-change="DepCatChange()">
+							<option ng-repeat="d in departments" value="{{d.Id}}">
 								{{d.Name}}
 							</option>
 						</select>
@@ -150,31 +145,48 @@
 				<div class="row">
 					<div class="col-md-3 col-xs-4">Category</div>
 					<div class="col-md-8 col-xs-8">
-						<select class="form-control" ng-model="tkt.category">
-							<option ng-repeat="c in deps | depCat:tkt.department" value="{{c.Id}}">
-								{{c.Name}}
+						<div class="well well-sm"  ng-hide="options.canEdit">
+							{{categoryName}}
+						</div>
+						<select class="form-control" ng-show="options.canEdit">
+							<option ng-repeat="cat in categories" value="{{cat.Id}}">
+								{{cat.Name}}
 							</option>
 						</select>
 					</div>
 				</div>
 				<hr>
 				<div class="row">
-					<div class="col-md-3 col-xs-4">Uploads</div>
-					<div class="col-md-8 col-xs-8"><input type="file" class="form-control" ng-model="tkt.upload"></div>
+					<div class="col-md-3 col-xs-4">Description</div>
+					<div class="col-md-8 col-xs-8">
+						<div class="well well-sm" ng-hide="options.canEdit">
+							{{ticket.Description}}
+						</div>
+						<textarea class="form-control" ng-show="options.canEdit" ng-model="ticket.Description"></textarea>
+					</div>
 				</div>
 				<hr>
 				<div class="row">
-					<div class="col-md-3 col-xs-4">Description</div>
-					<div class="col-md-8 col-xs-8"><textarea class="form-control" ng-model="tkt.description"></textarea></div>
+					<div class="col-md-3 col-xs-4">Notes</div>
+					<div class="col-md-8 col-xs-8">
+					</div>
+				</div>
+				<hr>
+				<div class="row">
+					<div class="col-md-3 col-xs-4">Documents</div>
+					<div class="col-md-8 col-xs-8">
+					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
-				<alert type="{{alert.type}}">{{alert.msg}}</alert>
-				<button class="btn btn-primary" ng-click="submit()">Submit</button>
+				<button class="btn btn-primary" ng-hide="options.newTicket" ng-click="update()">Update</button>
+				<button class="btn btn-primary" ng-show="options.newTicket" ng-click="submit()">Submit</button>
+				<button class="btn btn-success" ng-show="options.canClose" ng-click="close()">Close</button>
 				<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
 			</div>
 		</div>
 	</script>
+
 </body>
 
 </html>
