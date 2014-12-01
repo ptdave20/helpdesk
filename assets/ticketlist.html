@@ -1,0 +1,44 @@
+<nav class="navbar navbar-default">
+	<p class="navbar-text">View:</p>
+	<div class="navbar-btn">
+		<div class="btn-group">
+	        <label class="btn btn-success" ng-model="options.ticketStatus" btn-radio="'open'" ng-click="viewOpenTickets()" uncheckable>Open</label>
+	        <label class="btn btn-success" ng-model="options.ticketStatus" btn-radio="'closed'" ng-click="viewClosedTickets()" uncheckable>Closed</label>
+	    </div>
+	</div>
+</nav>
+<table class="table table-hover" ng-show="hasTickets">
+	<thead>
+		<td ng-show="options.tickets.selectable">&nbsp;</td>
+		<th>Subject</th>
+		<th>Created On</th>
+		<th ng-show="options.tickets.showDepartment">
+			Department
+		</th>
+		<th ng-show="options.tickets.showCategory">
+			Category
+		</th>
+		<th>Status</th>
+	</thead>
+	<tbody>
+		<tr ng-repeat="ticket in tickets">
+			<td ng-show="options.tickets.selectable"><input type="checkbox"></td>
+			<td>{{ticket.Subject}}</td>
+			<td>{{ticket.Created | date : 'short'}}</td>
+			<td ng-show="options.tickets.showDepartment">
+				{{ticket.Department | depFilter : departments}}
+			</td>
+			<td ng-show="options.tickets.showCategory">
+				{{ticket.Category}}
+			</td>
+			<td>
+				<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
+				<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
+			</td>
+			<td><button ng-click="openTicket(ticket)">Open</button></td>
+		</tr>
+	</tbody>
+</table>
+<h3 ng-hide="hasTickets">
+	<center>No tickets</center>
+</h3>

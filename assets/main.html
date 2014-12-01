@@ -31,40 +31,7 @@
 				<tab-heading>
 					Submissions
 				</tab-heading>
-				<nav class="navbar navbar-default">
-					<p class="navbar-text">View:</p>
-					<div class="navbar-btn">
-						<div class="btn-group">
-					        <label class="btn btn-success" ng-model="ticketSubmitterStatus" btn-radio="'open'" ng-click="viewSubmitterOpen()" uncheckable>Open</label>
-					        <label class="btn btn-success" ng-model="ticketSubmitterStatus" btn-radio="'closed'" ng-click="viewSubmitterClosed()" uncheckable>Closed</label>
-					    </div>
-					</div>
-				</nav>
-				<table class="table table-hover" ng-show="submittedHasTickets">
-					<thead>
-						<td>&nbsp;</td>
-						<th>Subject</th>
-						<th>Created On</th>
-						<th>Department</th>
-						<th>Category</th>
-						<th>Status</th>
-					</thead>
-					<tbody>
-						<tr ng-repeat="ticket in submitted">
-							<td><input type="checkbox"></td>
-							<td>{{ticket.Subject}}</td>
-							<td>{{ticket.Created | date : 'short'}}</td>
-							<td>{{ticket.Department | depFilter : departments}}</td>
-							<td>{{ticket.Category}}</td>
-							<td>
-								<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
-								<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
-							</td>
-							<td><button ng-click="openTicket(ticket)">Open</button></td>
-						</tr>
-					</tbody>
-				</table>
-				<h3 ng-hide="submittedHasTickets"><center>No tickets</center></h3>
+				<ng-view></ng-view>
 			</tab>
 			<tab ng-if="me.Department.length > 0">
 				<tab-heading>

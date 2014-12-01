@@ -241,6 +241,8 @@ angular.module('helpIndex').controller('ticketModal', function($scope,$http,$mod
 				// Set the uneditable value
 				$scope.departmentName = $scope.departments[d].Name;
 				
+				$scope.departments[d].Category = $scope.departments[d].Category || [];
+
 				// Set the editable categories
 				$scope.categories = $scope.departments[d].Category;
 
@@ -263,7 +265,7 @@ angular.module('helpIndex').controller('ticketModal', function($scope,$http,$mod
 			return;
 		$http.post(
 			'/o/ticket/insert',
-			$scope.tkt,
+			$scope.ticket,
 			{
 				withCredentials:true,
 				headers: { 
