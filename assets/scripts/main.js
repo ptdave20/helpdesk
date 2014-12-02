@@ -1,8 +1,20 @@
-angular.module('helpIndex',['ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap'])
+var helpdesk = angular.module('helpIndex',['ngRoute','ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap'])
 
+helpdesk.config(function($routeProvider) {
+	$routeProvider
+	.when('/', {
+		template: '<h1>Welcome to the helpdesk</h1>'
+	})
+	.when('/tickets/:area', {
+		templateUrl: 'ticketlist.html',
+		controller: 'ticketsListCtrl'
+	})
+	.when('/ticket/:id', {
+		templateUrl: 'ticket.html'
+	})
+});
 
-
-angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval) {
+angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location) {
 	$scope.submitted = [];
 	$scope.assigned = [];
 	$scope.department = [];
@@ -12,7 +24,22 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	$scope.submittedHasTickets = false;
 	$scope.assignedHasTickets = false;
 	$scope.departmentHasTickets = false;
+	$scope.options = {
+		tickets: {
+			selectable : false,
+			showDepartment: true,
+			showCategory: false,
+			status: "open",
+			hasTickets: false
+		},
+	};
 
+	$scope.isActive=function(route) {
+		if(route === '/') {
+			return $location.path() === '/';
+		}
+		return $location.path().indexOf(route) != -1;
+	}
 
 	$scope.selDepartment = null;
 
@@ -319,3 +346,22 @@ angular.module('helpIndex').controller('newTicketCtrl', function($scope,$http,$m
 		$modalInstance.dismiss();
 	}
 });
+
+
+helpdesk.controller('ticketsListCtrl', ['$scope','$routeParams','$http', function($scope,$routeParams,$http) {
+	switch($routeParams.area) {
+		case 'mine':
+			$scope.$parent.getSubmittedTickets();
+			break;
+		case 'department':
+			console.log('department');
+			break;
+		case 'assigned':
+			console.log('assigned');
+			break;
+		default:
+			console.log('unknown');
+			break;
+	}
+	console.log($scope);
+}]);

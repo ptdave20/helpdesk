@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="/scripts/angular/angular.js"></script>
   <script src="/scripts/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
+  <script src="/scripts/angular/angular-route.js"></script>
   <script src="/scripts/main.js"></script>
   <style>
   	body {
@@ -18,68 +19,40 @@
   </style>
 </head>
 <body ng-controller="bCtrl">
-	<div class="navbar nav navbar-inverse navbar-fixed-top" role="navigation">
-		<div class="navbar-brand">Helpdesk</div>
-		<div class="navbar-right">
-			<a type="button" class="btn btn-primary navbar-btn" href="#" ng-click="newTicket()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New ticket</a>
-			<a type="button" class="btn btn-danger navbar-btn" href="/o/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out</a>
-		</div>
-	</div>
-	<div class="container">
-		<tabset>
-			<tab>
-				<tab-heading>
-					Submissions
-				</tab-heading>
-				<ng-view></ng-view>
-			</tab>
-			<tab ng-if="me.Department.length > 0">
-				<tab-heading>
-					Departments
-				</tab-heading>
-				<nav class="navbar navbar-default">
-					<p class="navbar-text">View:</p>
-					<div class="navbar-btn">
-						<div class="btn-group">
-					        <label class="btn btn-success" ng-model="ticketDepartmentStatus" btn-radio="'open'" ng-click="viewDepartmentOpen()" uncheckable>Open</label>
-					        <label class="btn btn-success" ng-model="ticketDepartmentStatus" btn-radio="'closed'" ng-click="viewDepartmentClosed()" uncheckable>Closed</label>
-					    </div>
-					</div>
-					<form class="navbar-form">
-						<select class="form-control" ng-model="selDepartment" ng-change="getDepTickets()">
-							<option ng-repeat="department in me.Department" value="{{department}}">	
-								{{department | depName:this}}
-							</option>
-						</select>
-					</form>
-				</nav>
-				<table class="table table-hover">
-					<thead>
-						<td>&nbsp;</td>
-						<th>Subject</th>
-						<th>Created On</th>
-						<th>Department</th>
-						<th>Category</th>
-						<th>Status</th>
-					</thead>
-					<tbody>
-						<tr ng-repeat="ticket in department">
-							<td><input type="checkbox"></td>
-							<td>{{ticket.Subject}}</td>
-							<td>{{ticket.Created | date : 'short'}}</td>
-							<td>{{ticket.Department | depFilter : departments}}</td>
-							<td>{{ticket.Category}}</td>
-							<td>
-								<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
-								<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</tab>
-			<tab heading="Assigned Tickets"></tab>
-		</tabset>
+	<nav class="navbar nav navbar-inverse navbar-fixed-top" role="navigation">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#topbar-toggle">
+        	<span class="sr-only">Toggle navigation</span>
+        	<span class="icon-bar"></span>
+        	<span class="icon-bar"></span>
+        	<span class="icon-bar"></span>
+      	</button>
+		<span class="navbar-brand">Helpdesk</span>
 		
+      	<div class="collapse navbar-collapse" id="topbar-toggle">
+      		<ul class="nav navbar-nav">
+      			<li ng-class="{active:isActive('/')}"><a href="#">Home</a></li>
+      			<li ng-class="{active:isActive('/tickets')}" dropdown is-open="options.ticketMenuOpen">
+      				<a href="#" class="dropdown-toggle" data-toggle="dropdown" dropdown-toggle role="button" aria-expanded="false">Tickets <span class="caret"></span></a>
+      				<ul class="dropdown-menu" role="menu">
+      					<li><a href="#/tickets/mine">Mine</a></li>
+      					<li><a href="#/tickets/department">Departments</a></li>
+      					<li><a href="#/tickets/assigned">Assigned</a></li>
+      				</ul>
+      			</li>
+      			<li>
+      				<a ng-click="newTicket()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Ticket</a>
+      			</li>
+      			<li>
+      				<a href="/o/logout">
+      					<span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out
+  					</a>
+  				</li>
+      		</ul>
+      	</div>
+		
+	</nav>
+	<div class="container">
+		<div ng-view></div>
 	</div>
 	<script type="text/ng-template" id="ticketViewModal.html">
 		<div>
