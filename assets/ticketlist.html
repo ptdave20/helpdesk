@@ -7,13 +7,13 @@
 	        <label class="btn btn-success" ng-model="options.ticket.status" btn-radio="'closed'" ng-click="viewClosedTickets()" uncheckable>Closed</label>
 	    </div>
 	    <div ng-show="options.ticket.selectDepartment" class="btn-group" dropdown>
-	    	<button type="button" class="btn btn-danger">{{activeDepartment}}</button>
+	    	<button type="button" class="btn btn-danger">{{Departments.activeDepartment}}</button>
 	    	<button type="button" class="btn btn-danger dropdown-toggle" dropdown-toggle>
 		        <span class="caret"></span>
 	        	<span class="sr-only">Split button!</span>
 	      	</button>
 	      	<ul class="dropdown-menu" role="menu">
-		        <li ng-repeat="dep in availDepartments"><a ng-click="setDepartment(dep)">{{dep}}</a></li>
+		        <li ng-repeat="dep in Departments.available"><a ng-click="setDepartment(dep)">{{dep}}</a></li>
 	      	</ul>
 	    </div>
     </form>
