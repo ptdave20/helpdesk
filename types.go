@@ -9,6 +9,11 @@ import (
 )
 
 type (
+	Config struct {
+		RedirectURI  string `json:"redirect_uri"`
+		ClientID     string `json:"client_id"`
+		ClientSecret string `json:"client_secret"`
+	}
 	SimpleResult struct {
 		Result bool `json:"result"`
 	}

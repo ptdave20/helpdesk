@@ -111,8 +111,8 @@ func RequireLoginNoRedirectOutResult() martini.Handler {
 func Oauth2Handler() martini.Handler {
 
 	cfg, _ := oauth2.New(
-		oauth2.Client("812975936151-i8po4eflb6fggohokgl98d5998uh4t6k.apps.googleusercontent.com", "5oqoK2q-_lnHO5kCdB8DjSyh"),
-		oauth2.RedirectURL("http://localhost/o/token"),
+		oauth2.Client(CFG.ClientID, CFG.ClientSecret),
+		oauth2.RedirectURL(CFG.RedirectURI),
 		oauth2.Scope("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"),
 		google.Endpoint(),
 	)
