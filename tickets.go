@@ -36,6 +36,36 @@ func InitTicketService(m *martini.ClassicMartini) {
 				return ""
 			})
 		})
+		r.Group("/count", func(r martini.Router) {
+			r.Get("/department/:id/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+				found := false
+				for i := 0; i < len(u.Department); i++ {
+					if p["id"] == u.Department[i].Hex() {
+						found = true
+						break
+					}
+				}
+				if !found && !u.Roles.DomainAdmin {
+					return "denied"
+				}
+
+				c := db.C(TicketsC)
+				if p["status"] == "open" {
+					count, err := c.Find(bson.M{"department": bson.ObjectIdHex(p["id"]), "status": bson.M{"$ne": "closed"}}).Count()
+					if err != nil {
+						panic(err)
+					}
+
+					return strconv.Itoa(count)
+				}
+				count, err := c.Find(bson.M{"department": bson.ObjectIdHex(p["id"]), "status": p["status"]}).Count()
+				if err != nil {
+					panic(err)
+				}
+
+				return strconv.Itoa(count)
+			})
+		})
 
 		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			return ""

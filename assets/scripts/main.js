@@ -22,8 +22,8 @@ helpdesk.config(function($routeProvider) {
 	})
 });
 
-helpdesk.factory('Tickets', function() {
-	return {
+helpdesk.factory('Tickets', function($http) {
+	var obj = {
 		mine: {
 			open:[],
 			closed:[],
@@ -33,8 +33,13 @@ helpdesk.factory('Tickets', function() {
 			getTickets: function() {}
 		},
 		departments: {
+<<<<<<< HEAD
 			open:[],
 			close:[],
+=======
+			open: [],
+			closed: [],
+>>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 			status: "open",
 			lastOpenCount: -1,
 			currentOpenCount: -1,
@@ -50,9 +55,40 @@ helpdesk.factory('Tickets', function() {
 			currentOpenCount: -1,
 			getTickets: function() {}
 		}
+	};
+
+	obj.mine.getTickets = function() {
+		$http.get('/o/ticket/list/mine/'+obj.mine.status,{withCredentials:true}).success(function(data) {
+			switch(obj.mine.status) {
+				case "open":
+					obj.mine.open = data;
+					obj.mine.currentOpenCount = data.length;
+					break;
+				case "closed":
+					obj.mine.closed = data;
+					break;
+			}
+		});
 	}
+
+	obj.departments.getTickets = function() {
+		// If we don't have a department, then return
+		angular.forEach(obj.departments.available, function(depValue,depKey) {
+			angular.forEach(["open","closed"], function(statValue, statKey) {
+				$http.get('/o/ticket/list/department/'+depValue+"/"+statValue,{withCredentials:true}).success(function(data) {
+					if(data!=null) {
+						obj.departments[statValue] = data;
+					}
+				});
+			});
+			
+		});
+	}
+
+	return  obj;
 });
-helpdesk.factory('Departments', function() {
+helpdesk.factory('DepartmentsList', function($http) {
+
 	return [];
 });
 helpdesk.factory('Me', function() {
@@ -60,7 +96,7 @@ helpdesk.factory('Me', function() {
 });
 
 
-angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location,Tickets,Departments,Me) {
+angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location,Tickets,DepartmentsList,Me) {
 	$scope.submitted = [];
 	$scope.assigned = [];
 	$scope.departments = [];
@@ -80,6 +116,7 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	
 	$scope.Tickets = Tickets;
 
+<<<<<<< HEAD
 	Tickets.mine.getTickets = function() {
 		$http.get('/o/ticket/list/mine/'+Tickets.mine.status,{withCredentials:true}).success(function(data) {
 			switch(Tickets.mine.status) {
@@ -109,6 +146,8 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		});
 	}
 
+=======
+>>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 	Tickets.mine.getTickets();
 	Tickets.departments.getTickets();
 
@@ -381,22 +420,35 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','$interval','Tickets'
 	$scope.Departments = $scope.Tickets.departments;
 
 	$scope.activeDepartment = $scope.Departments.activeDepartment;
+<<<<<<< HEAD
 	$scope.tickets = $scope.Tickets.departments[$scope.options.ticket.status];
 
 	
+=======
+	$scope.availDepartments = $scope.Departments.available || [];
+	Tickets.departments.getTickets();
+>>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 	$scope.setDepartment = function(v) {
 		$scope.activeDepartment = v;
 		Tickets.departments.getTickets();
 	}
 	$scope.viewOpenTickets = function() {
+<<<<<<< HEAD
 		$scope.options.ticket.status = "open";
 		$scope.tickets = $scope.Departments[$scope.options.ticket.status];
+=======
+		$scope.status = "open";
+>>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 		Tickets.departments.getTickets();
 	}
 
 	$scope.viewClosedTickets = function() {
+<<<<<<< HEAD
 		$scope.options.ticket.status = "closed";
 		$scope.tickets = $scope.Departments[$scope.options.ticket.status];
+=======
+		$scope.status = "closed";
+>>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 		Tickets.departments.getTickets();
 	}
 
