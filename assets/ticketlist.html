@@ -1,11 +1,23 @@
-<nav class="navbar navbar-default">
-	<p class="navbar-text">View:</p>
-	<div class="navbar-btn">
-		<div class="btn-group">
+<nav class="nav navbar-default" role="navigation">
+	<form class="navbar-form" >
+
+		<p class="navbar-text">View:</p>
+		<div class="navbar-btn btn-group">
 	        <label class="btn btn-success" ng-model="options.ticket.status" btn-radio="'open'" ng-click="viewOpenTickets()" uncheckable>Open</label>
 	        <label class="btn btn-success" ng-model="options.ticket.status" btn-radio="'closed'" ng-click="viewClosedTickets()" uncheckable>Closed</label>
 	    </div>
-	</div>
+	    <div ng-show="options.ticket.selectDepartment" class="btn-group" dropdown>
+	    	<button type="button" class="btn btn-danger">{{activeDepartment}}</button>
+	    	<button type="button" class="btn btn-danger dropdown-toggle" dropdown-toggle>
+		        <span class="caret"></span>
+	        	<span class="sr-only">Split button!</span>
+	      	</button>
+	      	<ul class="dropdown-menu" role="menu">
+		        <li ng-repeat="dep in availDepartments"><a ng-click="setDepartment(dep)">{{dep}}</a></li>
+	      	</ul>
+	    </div>
+    </form>
+    
 </nav>
 <table class="table table-hover">
 	<thead>
