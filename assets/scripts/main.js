@@ -38,7 +38,7 @@ helpdesk.factory('Tickets', function($http) {
 			status: "open",
 			lastOpenCount: -1,
 			currentOpenCount: -1,
-			activeDepartment: "",
+			activeDepartment: null,
 			available:[],
 			getTickets: function() {}
 		},
@@ -68,16 +68,21 @@ helpdesk.factory('Tickets', function($http) {
 
 	obj.departments.getTickets = function() {
 		// If we don't have a department, then return
-		angular.forEach(obj.departments.available, function(depValue,depKey) {
-			angular.forEach(["open","closed"], function(statValue, statKey) {
-				$http.get('/o/ticket/list/department/'+depValue+"/"+statValue,{withCredentials:true}).success(function(data) {
-					if(data!=null) {
-						obj.departments[statValue] = data;
-					}
-				});
-			});
-			
+		if(obj.departments.activeDepartment==null)
+			return;
+		$http.get('/o/ticket/list/department/'+obj.departments.activeDepartment+"/"+obj.departments.status,{withCredentials:true}).success(function(data) {
+			while(obj.departments[obj.departments.status].length > 0)
+				obj.departments[obj.departments.status].pop();
+			if(data!=null) {
+				for(var i=0; i<data.length; i++) {
+					obj.departments[obj.departments.status].push(data[i]);
+				}
+				obj.departments[obj.departments.status] = data;
+			}
 		});
+
+
+			
 	}
 
 	return  obj;
@@ -379,27 +384,33 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets', function($
 		},
 	};
 
-	$scope.Departments = Tickets.departments;
+	$scope.Service = Tickets;
+	$scope.Departments = $scope.Service.departments;
+	$scope.Departments.open = [];
+	$scope.Departments.closed = [];
 
-	$scope.status = $scope.Departments.status;
-	$scope.activeDepartment = $scope.Departments.activeDepartment;
-	$scope.availDepartments = $scope.Departments.available || [];
-	Tickets.departments.getTickets();
+	$scope.status = $scope.Service.departments.status;
+	$scope.status = "open";
+	$scope.activeDepartment = $scope.Service.departments.activeDepartment;
+	$scope.availDepartments = $scope.Service.departments.available || [];
+	$scope.Service.departments.getTickets();
+
+	$scope.tickets = $scope.Service.departments.open;
 	$scope.setDepartment = function(v) {
 		$scope.activeDepartment = v;
 	}
 	$scope.viewOpenTickets = function() {
 		$scope.status = "open";
+		$scope.tickets = $scope.Service.departments.open;
 		Tickets.departments.getTickets();
 		console.log(Tickets.departments);
-		//$scope.Tickets.getTickets();
 	}
 
 	$scope.viewClosedTickets = function() {
 		$scope.status = "closed";
+		$scope.tickets = $scope.Service.departments.closed;
 		Tickets.departments.getTickets();
 		console.log(Tickets.departments);
-		//$scope.Tickets.getTickets();
 	}
 }]);
 
