@@ -33,13 +33,8 @@ helpdesk.factory('Tickets', function($http) {
 			getTickets: function() {}
 		},
 		departments: {
-<<<<<<< HEAD
-			open:[],
-			close:[],
-=======
 			open: [],
 			closed: [],
->>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 			status: "open",
 			lastOpenCount: -1,
 			currentOpenCount: -1,
@@ -116,7 +111,6 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 	
 	$scope.Tickets = Tickets;
 
-<<<<<<< HEAD
 	Tickets.mine.getTickets = function() {
 		$http.get('/o/ticket/list/mine/'+Tickets.mine.status,{withCredentials:true}).success(function(data) {
 			switch(Tickets.mine.status) {
@@ -146,8 +140,6 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		});
 	}
 
-=======
->>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 	Tickets.mine.getTickets();
 	Tickets.departments.getTickets();
 
@@ -420,35 +412,24 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','$interval','Tickets'
 	$scope.Departments = $scope.Tickets.departments;
 
 	$scope.activeDepartment = $scope.Departments.activeDepartment;
-<<<<<<< HEAD
 	$scope.tickets = $scope.Tickets.departments[$scope.options.ticket.status];
-
-	
-=======
 	$scope.availDepartments = $scope.Departments.available || [];
 	Tickets.departments.getTickets();
->>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 	$scope.setDepartment = function(v) {
 		$scope.activeDepartment = v;
 		Tickets.departments.getTickets();
 	}
 	$scope.viewOpenTickets = function() {
-<<<<<<< HEAD
 		$scope.options.ticket.status = "open";
 		$scope.tickets = $scope.Departments[$scope.options.ticket.status];
-=======
 		$scope.status = "open";
->>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 		Tickets.departments.getTickets();
 	}
 
 	$scope.viewClosedTickets = function() {
-<<<<<<< HEAD
 		$scope.options.ticket.status = "closed";
 		$scope.tickets = $scope.Departments[$scope.options.ticket.status];
-=======
 		$scope.status = "closed";
->>>>>>> e27939fa4118b4b763c9ce7feedd805fc70715bc
 		Tickets.departments.getTickets();
 	}
 

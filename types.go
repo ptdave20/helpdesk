@@ -17,6 +17,18 @@ type (
 	SimpleResult struct {
 		Result bool `json:"result"`
 	}
+	Device struct {
+		Id          bson.ObjectId `bson:"_id"`
+		BuildingId  bson.ObjectId `bson:"building_id,omitempty"`
+		DomainId    bson.ObjectId `bson:"domain_id,omitempty"`
+		LastUpdate  time.Time     `bson:"last_update,omitempty"`
+		FirstUpdate time.Time     `bson:"first_update,omitempty"`
+	}
+	DeviceEvent struct {
+		When  time.Time     `bson:"when"`
+		What  string        `bson:"what"`
+		WhoId bson.ObjectId `bson:"who_id"`
+	}
 	Group struct {
 		Id      bson.ObjectId   `bson:"_id"`
 		Members []bson.ObjectId `bson:"members"`
