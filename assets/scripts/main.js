@@ -220,7 +220,7 @@ angular.module('helpIndex').filter('catName', function() {
 angular.module('helpIndex').filter('paginate', function() {
 	return function(data, start, finish) {
 		var out = [];
-		
+
 		if(start < data.length)
 			start = 0;
 
@@ -231,7 +231,7 @@ angular.module('helpIndex').filter('paginate', function() {
 		for(var i=start; i<finish; i++) {
 			out.push(data[i]);
 		}
-		
+
 		return out;
 	}
 });
@@ -350,7 +350,9 @@ helpdesk.controller('myTicketListCtrl', ['$scope','$http','Tickets', function($s
 			showAssignedTo: false,
 			showSubmitter: false,
 			status: "open",
-			hasTickets: false
+			hasTickets: false,
+			order: 'date',
+			orderReverse: false
 		},
 	};
 
@@ -371,6 +373,13 @@ helpdesk.controller('myTicketListCtrl', ['$scope','$http','Tickets', function($s
 		$scope.tickets = $scope.Mine[$scope.status];
 		//$scope.Mine.getTickets();
 	}
+	$scope.setOrder = function(value) {
+		if($scope.order == value) {
+			$scope.order = "-"+$scope.order;
+		} else {
+			$scope.order = value;
+		}
+	}
 }]);
 
 helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets','DepartmentsList', function($scope,$http,Tickets,DepartmentsList) {
@@ -383,7 +392,7 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets','Department
 			showAssignedTo: false,
 			showSubmitter: false,
 			status: "open",
-			hasTickets: false
+			hasTickets: false,
 		},
 	};
 
@@ -406,6 +415,17 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets','Department
 	$scope.viewClosedTickets = function() {
 		$scope.tickets = $scope.Service.departments.closed;
 	}
+
+	$scope.setOrder = function(value) {
+		if($scope.order == value) {
+			if($scope.reverse == undefined)
+				$scope.reverse = false;
+			$scope.reverse = !$scope.reverse;
+		} else {
+			$scope.order = value;
+			$scope.reverse = false;
+		}
+	}
 }]);
 
 helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope,$http) {
@@ -417,7 +437,9 @@ helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope
 			showAssignedTo: false,
 			showSubmitter: false,
 			status: "open",
-			hasTickets: false
+			hasTickets: false,
+			order: 'date',
+			orderReverse: false
 		},
 	};
 	$scope.departments = $scope.departments;

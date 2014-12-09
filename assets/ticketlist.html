@@ -24,19 +24,19 @@
 </nav>
 <table class="table table-hover">
 	<thead>
-		<td ng-show="options.tickets.selectable">&nbsp;</td>
-		<th>Subject</th>
-		<th>Created On</th>
-		<th ng-show="options.tickets.showDepartment">
+		<td ng-show="options.ticket.selectable">&nbsp;</td>
+		<th ng-class="{active: order == 'Subject'}" ng-click="setOrder('Subject')">Subject</th>
+		<th ng-class="{active: order == 'Created'}" ng-click="setOrder('Created')">Created On</th>
+		<th ng-show="options.ticket.showDepartment">
 			Department
 		</th>
-		<th ng-show="options.tickets.showCategory">
+		<th ng-class="{active: order == 'Category'}" ng-click="setOrder('Category')" ng-show="options.ticket.showCategory">
 			Category
 		</th>
-		<th>Status</th>
+		<th ng-class="{active: order == 'Status'}" ng-click="setOrder('Status')">Status</th>
 	</thead>
 	<tbody>
-		<tr ng-repeat="ticket in tickets">
+		<tr ng-repeat="ticket in tickets | orderBy:order:reverse">
 			<td ng-show="options.ticket.selectable"><input type="checkbox"></td>
 			<td>{{ticket.Subject}}</td>
 			<td>{{ticket.Created | date : 'short'}}</td>
