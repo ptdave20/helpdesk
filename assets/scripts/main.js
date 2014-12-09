@@ -37,7 +37,7 @@ helpdesk.factory('Tickets', function($http) {
 			closed: [],
 			lastOpenCount: -1,
 			currentOpenCount: -1,
-			activeDepartment: null,
+			activeDepartment: "",
 			available:[],
 			getTickets: function() {}
 		},
@@ -67,6 +67,7 @@ helpdesk.factory('Tickets', function($http) {
 
 	obj.departments.getTickets = function() {
 		// If we don't have a department, then return
+<<<<<<< HEAD
 		if(obj.departments.activeDepartment==null)
 			return;
 		angular.forEach(["open"], function(stat, key) {
@@ -84,6 +85,18 @@ helpdesk.factory('Tickets', function($http) {
 			});
 		});
 		
+=======
+		angular.forEach(obj.departments.available, function(depValue,depKey) {
+			angular.forEach(["open","closed"], function(statValue, statKey) {
+				$http.get('/o/ticket/list/department/'+depValue+"/"+statValue,{withCredentials:true}).success(function(data) {
+					if(data!=null) {
+						obj.departments[statValue] = data;
+					}
+				});
+			});
+			
+		});
+>>>>>>> parent of 4e504f5... Fixed department output
 	}
 
 	return  obj;
@@ -396,6 +409,7 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets','Department
 		},
 	};
 
+<<<<<<< HEAD
 	$scope.Service = Tickets;
 	$scope.departments = DepartmentsList;
 
@@ -405,10 +419,19 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets','Department
 	$scope.Service.departments.getTickets();
 
 	$scope.tickets = $scope.Service.departments.open;
+=======
+	$scope.Departments = Tickets.departments;
+
+	$scope.status = $scope.Departments.status;
+	$scope.activeDepartment = $scope.Departments.activeDepartment;
+	$scope.availDepartments = $scope.Departments.available || [];
+	Tickets.departments.getTickets();
+>>>>>>> parent of 4e504f5... Fixed department output
 	$scope.setDepartment = function(v) {
 		$scope.activeDepartment = v;
 	}
 	$scope.viewOpenTickets = function() {
+<<<<<<< HEAD
 		$scope.tickets = $scope.Service.departments.open;
 	}
 
@@ -425,6 +448,19 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','Tickets','Department
 			$scope.order = value;
 			$scope.reverse = false;
 		}
+=======
+		$scope.status = "open";
+		Tickets.departments.getTickets();
+		console.log(Tickets.departments);
+		//$scope.Tickets.getTickets();
+	}
+
+	$scope.viewClosedTickets = function() {
+		$scope.status = "closed";
+		Tickets.departments.getTickets();
+		console.log(Tickets.departments);
+		//$scope.Tickets.getTickets();
+>>>>>>> parent of 4e504f5... Fixed department output
 	}
 }]);
 
