@@ -40,13 +40,7 @@ type (
 		DomainModBldg   bool `bson:"domain_mod_bldg"`
 		DomainModUser   bool `bson:"domain_mod_user"`
 		DomainModConfig bool `bson:"domain_mod_config"`
-
-		BldgViewTicket bool `bson:"bldg_view_tickets"`
-
-		DepAdmin        bool `bson:"dep_admin"`
-		DepViewTicket   bool `bson:"dep_view_tickets"`
-		DepAssignTicket bool `bson:"dep_assign_ticket"`
-		DepCloseTicket  bool `bson:"dep_close_ticket"`
+		BldgViewTicket  bool `bson:"bldg_view_tickets"`
 	}
 	Building struct {
 		Id   bson.ObjectId `bson:"_id"`
@@ -87,11 +81,20 @@ type (
 		Id   bson.ObjectId `bson:"_id"`
 		Name string        `bson:"name"`
 	}
+	DepartmentUser struct {
+		UserId          bson.ObjectId `bson:"user_id"`
+		DepAdmin        bool          `bson:"dep_admin"`
+		DepViewTicket   bool          `bson:"dep_view_tickets"`
+		DepAssignTicket bool          `bson:"dep_assign_ticket"`
+		DepCloseTicket  bool          `bson:"dep_close_ticket"`
+	}
 	Department struct {
-		Id               bson.ObjectId `bson:"_id"`
-		Name             string        `bson:"name"`
-		Category         []Category    `bson:"category,omitempty"`
-		BuildingSpecific bson.ObjectId `bson:"visible_to,omitempty"`
+		Id                 bson.ObjectId    `bson:"_id"`
+		Name               string           `bson:"name"`
+		Category           []Category       `bson:"category,omitempty"`
+		IsBuildingSpecific bool             `bson:"is_building_specific"`
+		Building           bson.ObjectId    `bson:"visible_to,omitempty"`
+		Users              []DepartmentUser `bson:"department_users,omitempty"`
 	}
 	Document struct {
 		Id        bson.ObjectId `bson:"_id"`
@@ -181,4 +184,34 @@ func (u User) GetAssignedTickets(db *mgo.Database) ([]Ticket, error) {
 	c := db.C(TicketsC)
 	err := c.Find(bson.M{"assigned_to": u.Id}).All(&t)
 	return t, err
+}
+func (u User) InDepartment(id bson.ObjectId) bool {
+	// If it is not a valid object id then return false
+	if !id.Valid() {
+		return false
+	}
+
+	// To limit the cpu work when retrieving a hex
+	hex := id.Hex()
+
+	// Iterate through the departments that the user is associated with
+	for i := 0; i < len(u.Department); i++ {
+		if hex == u.Department[i].Hex() {
+			return true
+		}
+	}
+	return false
+}
+func (u User) CanView(ticket Ticket) bool {
+
+	return false
+}
+func (u User) CanEdit(ticket Ticket) bool {
+	return false
+}
+func (u User) CanDelete(ticket Ticket) bool {
+	return false
+}
+func (u User) CanUpdate(ticket Ticket) bool {
+	return false
 }

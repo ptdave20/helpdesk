@@ -92,16 +92,6 @@ func InitTicketService(m *martini.ClassicMartini) {
 				allow = true
 			}
 
-			// Check to see if the user is allowed to close this based on department
-			for i := 0; i < len(u.Department); i++ {
-				if u.Department[i].Hex() == tkt.Department.Hex() {
-					if u.Roles.DepAdmin || u.Roles.DepCloseTicket {
-						allow = true
-						break
-					}
-				}
-			}
-
 			// Check to see if the user is allowed to close this based on
 			if u.Roles.DomainAdmin {
 				allow = true
