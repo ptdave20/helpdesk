@@ -124,6 +124,15 @@ type (
 		Notes       []Note        `bson:"notes"`
 		Documents   []Document    `bson:"document"`
 		Description string        `bson:"description,omitempty"`
+		Solution    string        `bson:"solution,omitempty"`
+	}
+	TicketUpdate struct {
+		AssignedTo  bson.ObjectId `json:"assigned_to,omitempty"`
+		Department  bson.ObjectId `json:"department,omitempty"`
+		Category    bson.ObjectId `json:"category,omitempty"`
+		Status      string        `json:"status,omitempty"`
+		Notes       []Note        `json:"notes"`
+		Description string        `json:"description,omitempty"`
 	}
 	TicketCount struct {
 		Day        int `bson:"day"`

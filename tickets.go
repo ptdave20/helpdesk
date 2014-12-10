@@ -111,7 +111,13 @@ func InitTicketService(m *martini.ClassicMartini) {
 			b, _ := json.Marshal(res)
 			return string(b)
 		})
-		r.Post("/insert", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
+		// If we post to a ticket id, we are trying to update
+		r.Post("/:id", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) {
+			d := json.NewDecoder(req.Body)
+			var ticket Ticket
+		})
+		// If a ticket is sent to us on the root of /o/ticket using POST, they are trying to add a ticket
+		r.Post("/", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) {
 			d := json.NewDecoder(req.Body)
 
 			var tkt Ticket
@@ -126,7 +132,6 @@ func InitTicketService(m *martini.ClassicMartini) {
 			tkt.Status = "open"
 
 			tkt.Created = time.Now()
-			//tkt.Closed = nil
 
 			c := db.C(TicketsC)
 			err = c.Insert(tkt)
