@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/golang/oauth2"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -174,10 +175,44 @@ type (
 	}
 )
 
+func (d Department) GetMember(id bson.ObjectId) (*DepartmentUser, error) {
+	for i := 0; i < len(d.Users); i++ {
+		if d.Users[i].UserId == id {
+			return &d.Users[i], nil
+		}
+	}
+	return nil, fmt.Errorf("Department: user %s is not a member of \"%s\"", id.Hex(), d.Name)
+}
+
 func (d *Department) GetDepartment(id bson.ObjectId, db *mgo.Database) error {
 	c := db.C(DepartmentsC)
 	return c.Find(bson.M{"_id": id}).One(&d)
 }
+func (d Department) CanEditTicket(u User, t Ticket) bool {
+	var depUser int = -1
+
+	// Is the user in the department on their list?
+	if !u.InDepartment(t.Department) {
+		return false
+	}
+
+	// Find the user in the department to get their roles
+	for i := 0; i < len(d.Users); i++ {
+		if d.Users[i].UserId.Hex() == u.Id.Hex() {
+			depUser = i
+			break
+		}
+	}
+
+	// Can't find them? then they can only view... maybe
+	if depUser == -1 {
+		return false
+	}
+
+	//
+	return true
+}
+
 func (u User) Marshal() ([]byte, error) {
 	ret, err := json.Marshal(u)
 	return ret, err
@@ -205,7 +240,7 @@ func (u User) InDepartment(id bson.ObjectId) bool {
 	}
 	return false
 }
-func (u User) CanView(ticket Ticket) bool {
+func (u User) CanViewTicket(ticket Ticket) bool {
 	if ticket.Submitter.Hex() == u.Id.Hex() {
 		return true
 	}
@@ -228,7 +263,7 @@ func (u User) CanView(ticket Ticket) bool {
 
 	return false
 }
-func (u User) CanEdit(ticket Ticket) bool {
+func (u User) CanEditTicket(ticket Ticket) bool {
 	if ticket.AssignedTo.Hex() == u.Id.Hex() {
 		return true
 	}
