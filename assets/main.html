@@ -35,7 +35,7 @@
       				<a href="#" class="dropdown-toggle" data-toggle="dropdown" dropdown-toggle role="button" aria-expanded="false">Tickets <span class="caret"></span></a>
       				<ul class="dropdown-menu" role="menu">
       					<li><a href="#/tickets/mine">Mine</a></li>
-      					<li><a href="#/tickets/department">Departments</a></li>
+      					<li ng-show="user.department.length"><a href="#/tickets/department">Departments</a></li>
       					<li><a href="#/tickets/assigned">Assigned</a></li>
       				</ul>
       			</li>

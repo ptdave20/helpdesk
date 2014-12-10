@@ -84,7 +84,6 @@ type (
 	DepartmentUser struct {
 		UserId          bson.ObjectId `bson:"user_id"`
 		DepAdmin        bool          `bson:"dep_admin"`
-		DepViewTicket   bool          `bson:"dep_view_tickets"`
 		DepAssignTicket bool          `bson:"dep_assign_ticket"`
 		DepCloseTicket  bool          `bson:"dep_close_ticket"`
 	}
@@ -175,6 +174,10 @@ type (
 	}
 )
 
+func (d *Department) GetDepartment(id bson.ObjectId, db *mgo.Database) error {
+	c := db.C(DepartmentsC)
+	return c.Find(bson.M{"_id": id}).One(&d)
+}
 func (u User) Marshal() ([]byte, error) {
 	ret, err := json.Marshal(u)
 	return ret, err
@@ -203,10 +206,41 @@ func (u User) InDepartment(id bson.ObjectId) bool {
 	return false
 }
 func (u User) CanView(ticket Ticket) bool {
+	if ticket.Submitter.Hex() == u.Id.Hex() {
+		return true
+	}
+
+	if ticket.AssignedTo.Hex() == u.Id.Hex() {
+		return true
+	}
+
+	if u.InDepartment(ticket.Department) {
+		return true
+	}
+
+	if u.Roles.DomainAdmin {
+		return true
+	}
+
+	if u.Roles.BldgViewTicket && ticket.Building.Hex() == u.Building.Hex() {
+		return true
+	}
 
 	return false
 }
 func (u User) CanEdit(ticket Ticket) bool {
+	if ticket.AssignedTo.Hex() == u.Id.Hex() {
+		return true
+	}
+
+	if ticket.Submitter.Hex() == u.Id.Hex() {
+		return true
+	}
+
+	if u.Roles.DomainAdmin {
+		return true
+	}
+
 	return false
 }
 func (u User) CanDelete(ticket Ticket) bool {
