@@ -184,6 +184,11 @@ type (
 	}
 )
 
+func (t Ticket) Marshal() string {
+	b, _ := json.Marshal(t)
+	return string(b)
+}
+
 func (d Department) GetMember(id bson.ObjectId) (*DepartmentUser, error) {
 	for i := 0; i < len(d.Users); i++ {
 		if d.Users[i].UserId == id {
@@ -292,4 +297,8 @@ func (u User) CanDelete(ticket Ticket) bool {
 }
 func (u User) CanUpdate(ticket Ticket) bool {
 	return false
+}
+func (r SimpleResult) Marshal() string {
+	b, _ := json.Marshal(r)
+	return string(b)
 }

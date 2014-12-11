@@ -6,67 +6,12 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"net/http"
-	"strconv"
+	//"strconv"
 	"time"
 )
 
 func InitTicketService(m *martini.ClassicMartini) {
 	m.Group("/o/ticket", func(r martini.Router) {
-		r.Get("/info/:id", func(db *mgo.Database, params martini.Params) string {
-			return params["id"]
-		})
-		r.Group("/list", func(r martini.Router) {
-			r.Get("/total_count", RequireLogin(), func(db *mgo.Database) string {
-				c := db.C(TicketsC)
-				count, _ := c.Find(bson.M{}).Count()
-				return strconv.Itoa(count)
-			})
-			r.Get("/mine/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-				return HandleUserTickets(db, u, p["status"])
-			})
-			r.Get("/:area/:id/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-				switch p["area"] {
-				case "department":
-					return HandleDepartmentTickets(db, u, p["id"], p["status"])
-					break
-				case "user":
-					return "unimplemented"
-					break
-				}
-				return ""
-			})
-		})
-		r.Group("/count", func(r martini.Router) {
-			r.Get("/department/:id/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-				found := false
-				for i := 0; i < len(u.Department); i++ {
-					if p["id"] == u.Department[i].Hex() {
-						found = true
-						break
-					}
-				}
-				if !found && !u.Roles.DomainAdmin {
-					return "denied"
-				}
-
-				c := db.C(TicketsC)
-				if p["status"] == "open" {
-					count, err := c.Find(bson.M{"department": bson.ObjectIdHex(p["id"]), "status": bson.M{"$ne": "closed"}}).Count()
-					if err != nil {
-						panic(err)
-					}
-
-					return strconv.Itoa(count)
-				}
-				count, err := c.Find(bson.M{"department": bson.ObjectIdHex(p["id"]), "status": p["status"]}).Count()
-				if err != nil {
-					panic(err)
-				}
-
-				return strconv.Itoa(count)
-			})
-		})
-
 		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			return ""
 		})
@@ -111,13 +56,32 @@ func InitTicketService(m *martini.ClassicMartini) {
 			b, _ := json.Marshal(res)
 			return string(b)
 		})
-		// If we post to a ticket id, we are trying to update
-		r.Post("/:id", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) {
-			d := json.NewDecoder(req.Body)
+		r.Get("/:id", RequireLogin(), func(u User, db *mgo.Database, req *http.Request, p martini.Params) string {
 			var ticket Ticket
+			var denied SimpleResult
+			denied.Result = false
+			c := db.C(TicketsC)
+			err := c.Find(bson.M{"_id": p["id"]}).One(&ticket)
+			if err != nil {
+				return denied.Marshal()
+			}
+
+			// Can the user on it's own view the ticket ( based on submitter, assigned to, building, or department )?
+			if u.CanViewTicket(ticket) {
+				return ticket.Marshal()
+			}
+
+			// They did not have permissions or roles
+			return denied.Marshal()
+		})
+		// If we post to a ticket id, we are trying to update
+		r.Post("/:id", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
+			//d := json.NewDecoder(req.Body)
+			//var ticket Ticket
+			return ""
 		})
 		// If a ticket is sent to us on the root of /o/ticket using POST, they are trying to add a ticket
-		r.Post("/", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) {
+		r.Post("/", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
 			d := json.NewDecoder(req.Body)
 
 			var tkt Ticket
@@ -146,6 +110,90 @@ func InitTicketService(m *martini.ClassicMartini) {
 				panic(err)
 			}
 			return string(out)
+		})
+	})
+	// This is strictly for retrieving tickets from the database
+	m.Group("/o/tickets", func(r martini.Router) {
+		r.Get("/assigned/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			c := db.C(TicketsC)
+			var tickets []Ticket
+
+			switch p["status"] {
+			case "all":
+				c.Find(bson.M{
+					"assigned_to": u.Id}).All(&tickets)
+				break
+			case "open":
+				c.Find(bson.M{
+					"assigned_to": u.Id,
+					"status":      bson.M{"$ne": "closed"}}).All(&tickets)
+				break
+			default:
+				c.Find(bson.M{
+					"assigned_to": u.Id,
+					"status":      p["status"]}).All(&tickets)
+				break
+			}
+
+			c.Find(bson.M{"assigned_to": u.Id}).All(&tickets)
+
+			b, _ := json.Marshal(tickets)
+
+			return string(b)
+		})
+		r.Get("/department/:id/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			c := db.C(TicketsC)
+			var tickets []Ticket
+			if !u.InDepartment(bson.ObjectId(p["id"])) {
+				// We do nothing
+			} else {
+				switch p["status"] {
+				case "all":
+					c.Find(bson.M{
+						"department": bson.ObjectId(p["id"])}).All(&tickets)
+					break
+				case "open":
+					c.Find(bson.M{
+						"department": bson.ObjectId(p["id"]),
+						"status":     bson.M{"$ne": "closed"}}).All(&tickets)
+					break
+				default:
+					c.Find(bson.M{
+						"department": bson.ObjectId(p["id"]),
+						"status":     p["status"]}).All(&tickets)
+					break
+				}
+
+			}
+
+			b, _ := json.Marshal(tickets)
+
+			return string(b)
+		})
+		r.Get("/submitted/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			c := db.C(TicketsC)
+			var tickets []Ticket
+
+			switch p["status"] {
+			case "all":
+				c.Find(bson.M{
+					"submitter": u.Id}).All(&tickets)
+				break
+			case "open":
+				c.Find(bson.M{
+					"submitter": u.Id,
+					"status":    bson.M{"$ne": "closed"}}).All(&tickets)
+				break
+			default:
+				c.Find(bson.M{
+					"submitter": u.Id,
+					"status":    p["status"]}).All(&tickets)
+				break
+			}
+			print(len(tickets))
+			b, _ := json.Marshal(tickets)
+
+			return string(b)
 		})
 	})
 }
