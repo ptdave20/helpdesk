@@ -52,7 +52,7 @@ helpdesk.factory('Tickets', function($http) {
 	};
 
 	obj.mine.getTickets = function() {
-		$http.get('/o/ticket/list/mine/'+obj.mine.status,{withCredentials:true}).success(function(data) {
+		$http.get('/o/tickets/submitted/'+obj.mine.status,{withCredentials:true}).success(function(data) {
 			switch(obj.mine.status) {
 				case "open":
 					obj.mine.open = data;
@@ -70,7 +70,10 @@ helpdesk.factory('Tickets', function($http) {
 		if(obj.departments.activeDepartment==null)
 			return;
 		angular.forEach(["open"], function(stat, key) {
-			$http.get('/o/ticket/list/department/'+obj.departments.activeDepartment+"/"+stat,{withCredentials:true}).success(function(data) {
+			$http.get('/o/tickets/department/'+obj.departments.activeDepartment+"/"+stat,{withCredentials:true}).success(function(data) {
+				if(data == null) {
+					return;
+				}
 				while(obj.departments[stat].length > 0) {
 					obj.departments[stat].pop();
 				}

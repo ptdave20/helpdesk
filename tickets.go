@@ -114,6 +114,18 @@ func InitTicketService(m *martini.ClassicMartini) {
 	})
 	// This is strictly for retrieving tickets from the database
 	m.Group("/o/tickets", func(r martini.Router) {
+		r.Get("/", RequireLogin(), func() string {
+			return "area required"
+		})
+		r.Get("/assigned", RequireLogin(), func() string {
+			return "status required"
+		})
+		r.Get("/department", RequireLogin(), func() string {
+			return "department required"
+		})
+		r.Get("/submitted", RequireLogin(), func() string {
+			return "status required"
+		})
 		r.Get("/assigned/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			c := db.C(TicketsC)
 			var tickets []Ticket
@@ -190,64 +202,9 @@ func InitTicketService(m *martini.ClassicMartini) {
 					"status":    p["status"]}).All(&tickets)
 				break
 			}
-			print(len(tickets))
 			b, _ := json.Marshal(tickets)
 
 			return string(b)
 		})
 	})
-}
-
-func HandleDepartmentTickets(db *mgo.Database, u User, t string, s string) string {
-	allow := false
-	for i := 0; i < len(u.Department); i++ {
-		if u.Department[i].Hex() == t {
-			allow = true
-			break
-		}
-	}
-
-	if u.Roles.DomainAdmin {
-		allow = true
-	}
-
-	if allow {
-		c := db.C(TicketsC)
-		var tickets []Ticket
-		if s != "closed" {
-			c.Find(bson.M{"department": bson.ObjectIdHex(t), "status": bson.M{"$ne": "closed"}}).All(&tickets)
-		} else {
-			if s == "all" {
-				c.Find(bson.M{"department": bson.ObjectIdHex(t)}).All(&tickets)
-			} else {
-				c.Find(bson.M{"department": bson.ObjectIdHex(t), "status": "closed"}).All(&tickets)
-			}
-		}
-		b, _ := json.Marshal(&tickets)
-		return string(b)
-	}
-	return "error"
-}
-
-func HandleAssignedTickets(db *mgo.Database, t string) string {
-	return t
-}
-
-func HandleUserTickets(db *mgo.Database, u User, t string) string {
-	c := db.C(TicketsC)
-
-	var tkts []Ticket
-
-	if t != "closed" {
-		c.Find(bson.M{"submitter": u.Id, "status": bson.M{"$ne": "closed"}}).All(&tkts)
-
-	} else if t == "all" {
-		c.Find(bson.M{"submitter": u.Id}).All(&tkts)
-	} else if t == "closed" {
-		c.Find(bson.M{"submitter": u.Id, "status": "closed"}).All(&tkts)
-	}
-
-	j, _ := json.Marshal(&tkts)
-
-	return string(j)
 }
