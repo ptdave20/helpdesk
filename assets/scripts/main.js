@@ -6,15 +6,15 @@ helpdesk.config(function($routeProvider) {
 		template: '<h1>Welcome to the helpdesk</h1>'
 	})
 	.when('/tickets/mine', {
-		templateUrl: 'ticketlist.html',
+		templateUrl: '/templates/ticketlist.html',
 		controller: 'myTicketListCtrl'
 	})
 	.when('/tickets/department', {
-		templateUrl: 'ticketList.html',
+		templateUrl: '/templates/ticketList.html',
 		controller: 'depTicketListCtrl'
 	})
 	.when('/tickets/assigned', {
-		templateUrl: 'ticketList.html',
+		templateUrl: '/templates/ticketList.html',
 		controller: 'assignedTicketListCtrl'
 	})
 	.when('/ticket/:id', {
@@ -165,7 +165,7 @@ helpdesk.factory('DepartmentsList', function($http) {
 
 angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location,Tickets,DepartmentsList) {
 	$scope.Tickets = Tickets;
-
+	$scope.isCollapsed = true;
 	$scope.Tickets.mine.getTickets();
 	$scope.Tickets.departments.getTickets();
 

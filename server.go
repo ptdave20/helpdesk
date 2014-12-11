@@ -23,9 +23,10 @@ func main() {
 	}
 
 	m := martini.Classic()
+
 	m.Use(martini.Static("assets", martini.StaticOptions{Fallback: "/index.html", Exclude: "/o"}))
 	m.Use(MongoDB())
-	m.Use(gzip.All())
+
 	m.Use(sessions.Sessions("session", sessions.NewCookieStore([]byte("session"))))
 	m.Use(Oauth2Handler())
 
@@ -34,6 +35,7 @@ func main() {
 	InitializeDepartmentService(m)
 	InitTicketService(m)
 
+	m.Use(gzip.All())
 	m.RunOnAddr(":80")
 
 }
