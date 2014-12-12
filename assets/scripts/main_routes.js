@@ -17,6 +17,7 @@ helpdesk
 		controller: 'assignedTicketListCtrl'
 	})
 	.when('/ticket/:id', {
-		templateUrl: 'ticket.html'
+		templateUrl: '/templates/ticket.html',
+		controller: 'ticketViewCtrl'
 	})
 });

@@ -3,50 +3,62 @@
 		<!-- START OF TOP ROW -->
 		<div class="col-md-6">
 			<!-- SUBJECT / CREATED ON / STATUS -->
-			<div class="panel">
-				<div class="panel-header">Subject</div>
-				<div class="panel-body"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">Subject</div>
+				<div class="panel-body">
+					{{ticket.Subject}}
+				</div>
 			</div>
-			<div class="panel">
-				<div class="panel-header">Created / Closed On</div>
-				<div class="panel-body"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">Created / Closed On</div>
+				<div class="panel-body">
+					{{ticket.Created}}
+				</div>
 			</div>
-			<div class="panel">
-				<div class="panel-header">Status</div>
-				<div class="panel-body"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">Status</div>
+				<div class="panel-body">
+					{{ticket.Status}}
+				</div>
 			</div>
 		</div>
 		<div class="col-md-6">
 			<!-- DEPARTMENT / CATEGORY / ASSIGNED TO -->
-			<div class="panel">
-				<div class="panel-header">Department</div>
-				<div class="panel-body"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">Department</div>
+				<div class="panel-body">
+					{{ticket.Department}}
+				</div>
 			</div>
-			<div class="panel">
-				<div class="panel-header">Category</div>
-				<div class="panel-body"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">Category</div>
+				<div class="panel-body">
+					{{ticket.Category}}
+				</div>
 			</div>
-			<div class="panel">
-				<div class="panel-header">Assigned To</div>
-				<div class="panel-body"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">Assigned To</div>
+				<div class="panel-body">
+					{{ticket.AssignedTo}}
+				</div>
 			</div>
 		</div>
 		<!-- END OF TOP ROW -->
 	</div>
-	<div class="panel">
-		<div class="panel-header">Description</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">Description</div>
+		<div class="panel-body">{{ticket.Description}}</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">Attachments</div>
 		<div class="panel-body"></div>
 	</div>
-	<div class="panel">
-		<div class="panel-header">Attachments</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">Notes</div>
 		<div class="panel-body"></div>
 	</div>
-	<div class="panel">
-		<div class="panel-header">Notes</div>
-		<div class="panel-body"></div>
-	</div>
-	<div class="panel">
-		<div class="panel-header">Solution</div>
-		<div class="panel-body"></div>
+	<div class="panel panel-default">
+		<div class="panel-heading">Solution</div>
+		<div class="panel-body">{{ticket.Solution}}</div>
 	</div>
 </div>

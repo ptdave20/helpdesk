@@ -1,4 +1,4 @@
-var helpdesk = angular.module('helpIndex',['ngRoute','ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap'])
+var helpdesk = angular.module('helpIndex',['ngRoute','ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap']);
 
 
 helpdesk.service('DepartmentsService', function($http) {
@@ -44,8 +44,12 @@ helpdesk.service('MyTickets', function($http) {
 	return obj;
 });
 
-helpdesk.service('Ticket', ['$http',function() {
+helpdesk.service('TicketService', ['$http',function($http) {
 	function TicketService() {
+		this.Get = function(id) {
+			console.log(id);
+			return $http.get('/o/ticket/'+id,{withCredentials:true});
+		}
 		this.Update = function(ticket) {
 			console.log(ticket);
 		}
@@ -56,6 +60,9 @@ helpdesk.service('Ticket', ['$http',function() {
 			console.log(ticket);
 		}
 		this.AddNote = function(ticket,private,data) {
+			console.log(ticket);
+		}
+		this.Create = function(ticket) {
 			console.log(ticket);
 		}
 	}
@@ -73,23 +80,19 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		return $location.path().indexOf(route) != -1;
 	}
 
-	$scope.openTicket = function(ticketData) {
+	$scope.openTicket = function(ticketId) {
 		var modalInstance = $modal.open({
 			templateUrl: 'ticketViewModal.html',
 			controller: 'ticketModal',
 			backdrop: 'static',
 			resolve: {
-				ticket: function() {
-					return ticketData;
-				},
 				departments: function() {
 					return $scope.departments;
 				},
 				options: function() {
 					return {
 						newTicket: false,
-						canEdit: ticketData.Status != "closed",
-						canClose: ticketData.Status != "closed"
+						ticketId: ticketId
 					}
 				}
 			}
@@ -225,14 +228,14 @@ angular.module('helpIndex').filter('depFilter', function() {
 	}
 });
 
-angular.module('helpIndex').controller('ticketModal', function($scope,$http,$modalInstance,ticket,DepartmentsService,options) {
-	$scope.ticket = ticket;
+angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalInstance','TicketService', 'DepartmentsService', 'options', function($scope,$http,$modalInstance,TicketService,DepartmentsService,options) {
+	$scope.ticket = {};
 	$scope.departments = []
 	$scope.categories = [];
 	$scope.options = options;
 
-	DepartmentsService.getDepartments().then(function(data) { $scope.departments = data.data});
-
+	DepartmentsService.getDepartments().then(function(data) { $scope.departments = data.data; });
+	TicketService.Get($scope.options.ticketId).then(function(data) { $scope.ticket = data.data; });
 	$scope.DepCatChange = function() {
 		for(var d=0; d<$scope.departments.length; d++) {
 			if($scope.departments[d].Id == $scope.ticket.Department) {
@@ -283,10 +286,10 @@ angular.module('helpIndex').controller('ticketModal', function($scope,$http,$mod
 	}
 	$scope.DepCatChange();
 	
-});
+}]);
 
 
-helpdesk.controller('myTicketListCtrl', ['$scope','$http','MyTickets', function($scope,$http,MyTickets) {
+helpdesk.controller('myTicketListCtrl', ['$scope','$http','$modal','MyTickets','TicketService', function($scope,$http,$modal,MyTickets,TicketService) {
 	$scope.options = {
 		ticket: {
 			selectDepartment: false,
@@ -315,6 +318,32 @@ helpdesk.controller('myTicketListCtrl', ['$scope','$http','MyTickets', function(
 			$scope.order = value;
 			$scope.reverse = false;
 		}
+	}
+
+	$scope.openTicket = function(ticketId) {
+		var modalInstance = $modal.open({
+			templateUrl: 'ticketViewModal.html',
+			controller: 'ticketModal',
+			backdrop: 'static',
+			resolve: {
+				departments: function() {
+					return $scope.departments;
+				},
+				options: function() {
+					return {
+						newTicket: false,
+						ticketId: ticketId
+					}
+				}
+			}
+		});
+
+		modalInstance.result.then(function(data) {
+			if(data) {
+				$scope.Tickets.departments.getTickets();
+				$scope.Tickets.mine.getTickets();
+			}
+		});
 	}
 }]);
 
@@ -380,4 +409,8 @@ helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope
 	};
 	$scope.departments = $scope.departments;
 	$scope.tickets = $scope.$parent.mine;
+}]);
+
+helpdesk.controller('ticketViewCtrl', ['$scope','$http', function($scope,$http) {
+	
 }]);

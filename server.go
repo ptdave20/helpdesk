@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/go-martini/martini"
-	"github.com/martini-contrib/gzip"
+	//"github.com/martini-contrib/gzip"
 	"github.com/martini-contrib/sessions"
 	"io/ioutil"
 	"log"
@@ -35,7 +35,7 @@ func main() {
 	InitializeDepartmentService(m)
 	InitTicketService(m)
 
-	m.Use(gzip.All())
+	//m.Use(gzip.All())
 	m.RunOnAddr(":80")
 
 }

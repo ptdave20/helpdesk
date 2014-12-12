@@ -50,7 +50,10 @@
 				<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
 				<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
 			</td>
-			<td><button ng-click="openTicket(ticket)">Open</button></td>
+			<td>
+				<a class="btn btn-primary" href="#/ticket/{{ticket.Id}}">Open</a>
+				<a class="btn btn-info" ng-click="openTicket(ticket.Id)">Quick View</a>
+			</td>
 		</tr>
 	</tbody>
 </table>

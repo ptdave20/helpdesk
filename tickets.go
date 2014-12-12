@@ -61,8 +61,9 @@ func InitTicketService(m *martini.ClassicMartini) {
 			var denied SimpleResult
 			denied.Result = false
 			c := db.C(TicketsC)
-			err := c.Find(bson.M{"_id": p["id"]}).One(&ticket)
+			err := c.Find(bson.M{"_id": bson.ObjectIdHex(p["id"])}).One(&ticket)
 			if err != nil {
+				print(err.Error())
 				return denied.Marshal()
 			}
 
