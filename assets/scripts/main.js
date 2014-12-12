@@ -1,45 +1,28 @@
 var helpdesk = angular.module('helpIndex',['ngRoute','ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap'])
 
-helpdesk.config(function($routeProvider) {
-	$routeProvider
-	.when('/', {
-		template: '<h1>Welcome to the helpdesk</h1>'
-	})
-	.when('/tickets/mine', {
-		templateUrl: '/templates/ticketlist.html',
-		controller: 'myTicketListCtrl'
-	})
-	.when('/tickets/department', {
-		templateUrl: '/templates/ticketList.html',
-		controller: 'depTicketListCtrl'
-	})
-	.when('/tickets/assigned', {
-		templateUrl: '/templates/ticketList.html',
-		controller: 'assignedTicketListCtrl'
-	})
-	.when('/ticket/:id', {
-		templateUrl: 'ticket.html'
-	})
+
+helpdesk.service('DepartmentsService', function($http) {
+	function DeptListService() {
+		this.getDepartments = function() {
+			return $http.get('/o/departments/list',{withCredentials:true});
+		}
+	}
+	var obj = new DeptListService();
+	return obj;
 });
 
 helpdesk.service('DeptTickets', function($http) {
 	var obj = {};
-	obj._tickets = [];
-	obj._department = ""
-	obj._status = "open"
+	obj._department = "";
+	obj._status = "open";
+	obj.setDepartment = function(id) {
+		obj._department = id;
+	}
 	obj.getTickets = function() {
 		var promise;
 		if(obj._department == "" || obj._department == null || obj._department == undefined)
 			return;
 		$http.get("/o/tickets/departments/"+obj._department+"/"+obj._status,{withCredentials:true})
-		.success(function(data) {
-			while(obj._tickets.length > 0) {
-				obj._tickets.pop();
-			}
-
-			if(Array.isArray(data))
-				obj._tickets.concat(data);
-		});
 		return promise;
 	}
 	obj.setStatus = function(status) {
@@ -70,109 +53,18 @@ helpdesk.service('Ticket', ['$http',function() {
 			console.log(ticket);
 		}
 		this.Assign = function(ticket,user_id) {
-
+			console.log(ticket);
 		}
 		this.AddNote = function(ticket,private,data) {
-
+			console.log(ticket);
 		}
 	}
 
 	return new TicketService();
 }]);
 
-helpdesk.factory('Tickets', function($http) {
-	var obj = {
-		mine: {
-			open:[],
-			closed:[],
-			status: "open",
-			lastOpenCount: -1,
-			currentOpenCount: -1,
-			getTickets: function() {}
-		},
-		departments: {
-			open: [],
-			closed: [],
-			lastOpenCount: -1,
-			currentOpenCount: -1,
-			activeDepartment: null,
-			available:[],
-			getTickets: function() {}
-		},
-		assigned: {
-			open:[],
-			closed:[],
-			status: "open",
-			lastOpenCount: -1,
-			currentOpenCount: -1,
-			getTickets: function() {}
-		}
-	};
-
-	obj.mine.getTickets = function() {
-		$http.get('/o/tickets/submitted/'+obj.mine.status,{withCredentials:true}).success(function(data) {
-			switch(obj.mine.status) {
-				case "open":
-					obj.mine.open = data;
-					obj.mine.currentOpenCount = data.length;
-					break;
-				case "closed":
-					obj.mine.closed = data;
-					break;
-			}
-		});
-	}
-
-	obj.departments.getTickets = function() {
-		// If we don't have a department, then return
-		if(obj.departments.activeDepartment==null)
-			return;
-		angular.forEach(["open"], function(stat, key) {
-			$http.get('/o/tickets/department/'+obj.departments.activeDepartment+"/"+stat,{withCredentials:true}).success(function(data) {
-				if(data == null) {
-					return;
-				}
-				while(obj.departments[stat].length > 0) {
-					obj.departments[stat].pop();
-				}
-					
-				if(data!=null) {
-					for(var i=0; i<data.length; i++) {
-						obj.departments[stat].push(data[i]);
-					}
-					obj.departments[stat] = data;
-				}
-			});
-		});
-		
-	}
-
-	return  obj;
-});
-helpdesk.factory('DepartmentsList', function($http) {
-	var ret = [];
-
-	$http.get('/o/departments/list',{withCredentials:true}).success(function(data) {
-		while(ret.length > 0)
-			ret.pop();
-		for(var i=0; i<data.length; i++)
-			ret.push(data[i]);
-		//$scope.departments = j;
-	});
-
-	return ret;
-});
-
-angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location,Tickets,DepartmentsList) {
-	$scope.Tickets = Tickets;
+angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location) {
 	$scope.isCollapsed = true;
-	$scope.Tickets.mine.getTickets();
-	$scope.Tickets.departments.getTickets();
-
-	$scope.updateTask = $interval(function() {
-		$scope.Tickets.mine.getTickets();
-		$scope.Tickets.departments.getTickets();
-	}, 10000);
 
 	$scope.isActive=function(route) {
 		if(route === '/') {
@@ -180,15 +72,6 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		}
 		return $location.path().indexOf(route) != -1;
 	}
-
-	$http.get('/o/user/me',{withCredentials:true}).success(function(data) {
-		angular.forEach(data.Department, function(value,key) {
-			Tickets.departments.available.push(value);
-
-			if(Tickets.departments.activeDepartment == "" || Tickets.departments.activeDepartment == undefined)
-				Tickets.departments.activeDepartment = value;
-		});
-	});
 
 	$scope.openTicket = function(ticketData) {
 		var modalInstance = $modal.open({
@@ -342,11 +225,13 @@ angular.module('helpIndex').filter('depFilter', function() {
 	}
 });
 
-angular.module('helpIndex').controller('ticketModal', function($scope,$http,$modalInstance,ticket,departments,options) {
+angular.module('helpIndex').controller('ticketModal', function($scope,$http,$modalInstance,ticket,DepartmentsService,options) {
 	$scope.ticket = ticket;
-	$scope.departments = departments;
+	$scope.departments = []
 	$scope.categories = [];
 	$scope.options = options;
+
+	DepartmentsService.getDepartments().then(function(data) { $scope.departments = data.data});
 
 	$scope.DepCatChange = function() {
 		for(var d=0; d<$scope.departments.length; d++) {

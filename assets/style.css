@@ -3,3 +3,8 @@
 		display: none;
 	}
 }
+
+
+.navbar-fixed-top {
+	padding-right: 70px;
+}
