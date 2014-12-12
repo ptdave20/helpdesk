@@ -1,5 +1,5 @@
-<nav class="nav navbar-default" role="navigation">
-	<form class="navbar-form" >
+<nav class="nav navbar-default hidden-xs" role="navigation">
+	<form class="navbar-form">
 		<!--
 		<p class="navbar-text">View:</p>
 		<div class="navbar-btn btn-group">
@@ -22,38 +22,41 @@
     </form>
     
 </nav>
-<table class="table table-hover">
+<table class="table table-hover hidden-print">
 	<thead>
 		<td ng-show="options.ticket.selectable">&nbsp;</td>
 		<th ng-class="{active: order == 'Subject'}" ng-click="setOrder('Subject')">Subject</th>
-		<th ng-class="{active: order == 'Created'}" ng-click="setOrder('Created')">Created On</th>
+		<th ng-class="{active: order == 'Created'}" ng-click="setOrder('Created')" class="hidden-xs">Created On</th>
 		<th ng-show="options.ticket.showDepartment">
 			Department
 		</th>
 		<th ng-class="{active: order == 'Category'}" ng-click="setOrder('Category')" ng-show="options.ticket.showCategory">
 			Category
 		</th>
-		<th ng-class="{active: order == 'Status'}" ng-click="setOrder('Status')">Status</th>
+		<th ng-class="{active: order == 'Status'}" ng-click="setOrder('Status')" class="hidden-xs">Status</th>
 	</thead>
 	<tbody>
 		<tr ng-repeat="ticket in tickets | orderBy:order:reverse">
 			<td ng-show="options.ticket.selectable"><input type="checkbox"></td>
 			<td>{{ticket.Subject}}</td>
-			<td>{{ticket.Created | date : 'short'}}</td>
+			<td class="hidden-xs">{{ticket.Created | date : 'short'}}</td>
 			<td ng-show="options.ticket.showDepartment">
 				{{ticket.Department | depName : this}}
 			</td>
 			<td ng-show="options.ticket.showCategory">
 				{{ticket.Category | catName : this}}
 			</td>
-			<td>
+			<td class="hidden-xs">
 				<span class="label label-success" ng-show="{{ticket.Status != 'closed'}}">Open</span>
 				<span class="label label-default" ng-show="{{ticket.Status == 'closed'}}">Closed</span>
 			</td>
 			<td>
-				<a class="btn btn-primary" href="#/ticket/{{ticket.Id}}">Open</a>
+				<a class="btn btn-primary hidden-xs" href="#/ticket/{{ticket.Id}}">Open</a>
 				<a class="btn btn-info" ng-click="openTicket(ticket.Id)">Quick View</a>
 			</td>
 		</tr>
 	</tbody>
 </table>
+<div class="visible-print-block" ng-repeat="ticket in tickets | orderBy:order:reverse">
+
+</div>

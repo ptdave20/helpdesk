@@ -228,6 +228,70 @@ angular.module('helpIndex').filter('depFilter', function() {
 	}
 });
 
+angular.module('helpIndex').filter('buildingFilter', function() {
+	return function(data,id) {
+		id = id || "";
+
+		if(id == "")
+			return data;
+
+		var out = [];
+		for(var i=0; i<data.length; i++) {
+			if(data[i].Building == id)
+				out.push(data[i]);
+		}
+		return out;
+	}
+});
+
+angular.module('helpIndex').filter('categoryFilter', function() {
+	return function(data,id) {
+		id = id || "";
+
+		if(id == "")
+			return data;
+
+		var out = [];
+		for(var i=0; i<data.length; i++) {
+			if(data[i].Category == id)
+				out.push(data[i]);
+		}
+		return out;
+	}
+});
+
+angular.module('helpIndex').filter('departmentFilter', function() {
+	return function(data,id) {
+		id = id || "";
+
+		if(id == "")
+			return data;
+
+		var out = [];
+		for(var i=0; i<data.length; i++) {
+			if(data[i].Department == id)
+				out.push(data[i]);
+		}
+		return out;
+	}
+});
+
+angular.module('helpIndex').filter('statusFilter', function() {
+	return function(data,id) {
+		id = id || "";
+
+		if(id == "")
+			return data;
+
+		var out = [];
+		for(var i=0; i<data.length; i++) {
+			if(data[i].Status == id)
+				out.push(data[i]);
+		}
+		return out;
+	}
+});
+
 angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalInstance','TicketService', 'DepartmentsService', 'options', function($scope,$http,$modalInstance,TicketService,DepartmentsService,options) {
 	$scope.ticket = {};
 	$scope.departments = []
@@ -411,6 +475,3 @@ helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope
 	$scope.tickets = $scope.$parent.mine;
 }]);
 
-helpdesk.controller('ticketViewCtrl', ['$scope','$http', function($scope,$http) {
-	
-}]);
