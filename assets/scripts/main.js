@@ -18,15 +18,15 @@ helpdesk.service('DeptTickets', function($http) {
 	obj.setDepartment = function(id) {
 		obj._department = id;
 	}
-	obj.getTickets = function() {
-		var promise;
+	obj.getTickets = function(status,department) {
+		/*
 		if(obj._department == "" || obj._department == null || obj._department == undefined)
 			return;
-		$http.get("/o/tickets/departments/"+obj._department+"/"+obj._status,{withCredentials:true})
-		return promise;
-	}
-	obj.setStatus = function(status) {
-		obj._status = status;
+		*/
+		if(department == undefined || department == null)
+			return;
+		status = status || "open";
+		return $http.get("/o/tickets/departments/"+obj._department+"/"+obj._status,{withCredentials:true})
 	}
 	return obj;
 });
@@ -40,6 +40,25 @@ helpdesk.service('MyTickets', function($http) {
 	}
 	obj.setStatus = function(status) {
 		obj._status = status;
+	}
+	obj.getCount = function() {
+		return $http.get("/o/tickets/submitted",{withCredentials:true});
+	}
+	return obj;
+});
+helpdesk.service('MyAssigned', function($http) {
+	var obj = {};
+	obj._status = "open";
+	obj.getTickets = function() {
+		var promise;
+		promise = $http.get("/o/tickets/assigned/"+obj._status,{withCredentials:true});
+		return promise;
+	}
+	obj.setStatus = function(status) {
+		obj._status = status;
+	}
+	obj.getCount = function() {
+		return $http.get("/o/tickets/assigned",{withCredentials:true});
 	}
 	return obj;
 });
@@ -70,7 +89,7 @@ helpdesk.service('TicketService', ['$http',function($http) {
 	return new TicketService();
 }]);
 
-angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location) {
+angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location,MyAssigned) {
 	$scope.isCollapsed = true;
 
 	$scope.isActive=function(route) {
@@ -79,6 +98,11 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		}
 		return $location.path().indexOf(route) != -1;
 	}
+
+	$scope.hasAssigned = false;
+	MyAssigned.getCount().then(function(data) {
+		$scope.hasAssigned = data.data > 0;
+	});
 
 	$scope.openTicket = function(ticketId) {
 		var modalInstance = $modal.open({
@@ -292,68 +316,11 @@ angular.module('helpIndex').filter('statusFilter', function() {
 	}
 });
 
-angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalInstance','TicketService', 'DepartmentsService', 'options', function($scope,$http,$modalInstance,TicketService,DepartmentsService,options) {
-	$scope.ticket = {};
-	$scope.departments = []
-	$scope.categories = [];
-	$scope.options = options;
-
-	DepartmentsService.getDepartments().then(function(data) { $scope.departments = data.data; });
-	TicketService.Get($scope.options.ticketId).then(function(data) { $scope.ticket = data.data; });
-	$scope.DepCatChange = function() {
-		for(var d=0; d<$scope.departments.length; d++) {
-			if($scope.departments[d].Id == $scope.ticket.Department) {
-				// Set the uneditable value
-				$scope.departmentName = $scope.departments[d].Name;
-				
-				$scope.departments[d].Category = $scope.departments[d].Category || [];
-
-				// Set the editable categories
-				$scope.categories = $scope.departments[d].Category;
-
-				// Set the uneditable category value
-				for(var c=0; c<$scope.departments[d].Category.length; c++) {
-					if($scope.departments[d].Category[c].Id == $scope.ticket.Category) {
-						$scope.categoryName = $scope.departments[d].Category[c].Name;
-					}
-				}
-			}
-		}
-	}
-
-	$scope.update = function() {
-
-	}
-
-	$scope.submit = function() {
-		if(!$scope.options.newTicket)
-			return;
-		$http.post(
-			'/o/ticket/insert',
-			$scope.ticket,
-			{
-				withCredentials:true,
-				headers: { 
-					'Content-Type': 'application/json',
-				}
-			}
-		).success(function(data) {
-			j = angular.fromJson(data);
-
-			if(j["Id"]!=null || j["Id"]!=undefined) {
-				$modalInstance.close(true);	
-			}
-		});
-	}
-	$scope.cancel = function() {
-		$modalInstance.dismiss();
-	}
-	$scope.DepCatChange();
-	
-}]);
 
 
-helpdesk.controller('myTicketListCtrl', ['$scope','$http','$modal','MyTickets','TicketService', function($scope,$http,$modal,MyTickets,TicketService) {
+
+helpdesk.controller('myTicketListCtrl', 
+	['$scope','$http','$modal','MyTickets','TicketService', 'DepartmentsService', function($scope,$http,$modal,MyTickets,TicketService,DepartmentsService) {
 	$scope.options = {
 		ticket: {
 			selectDepartment: false,
@@ -369,6 +336,9 @@ helpdesk.controller('myTicketListCtrl', ['$scope','$http','$modal','MyTickets','
 		},
 	};
 
+	DepartmentsService.getDepartments().then(function(data) {
+		$scope.departments = data.data;
+	});
 	$scope.Service = MyTickets;
 	$scope.Service.getTickets().then(function(data) {
 		$scope.tickets = data.data;

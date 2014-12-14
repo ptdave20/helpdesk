@@ -27,13 +27,13 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">Department</div>
 				<div class="panel-body">
-					{{ticket.Department}}
+					{{ticket.Department | depName : this}}
 				</div>
 			</div>
 			<div class="panel panel-default">
 				<div class="panel-heading">Category</div>
 				<div class="panel-body">
-					{{ticket.Category}}
+					{{ticket.Category | catName : this}}
 				</div>
 			</div>
 			<div class="panel panel-default">

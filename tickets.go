@@ -6,7 +6,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"net/http"
-	//"strconv"
+	"strconv"
 	"time"
 )
 
@@ -118,14 +118,19 @@ func InitTicketService(m *martini.ClassicMartini) {
 		r.Get("/", RequireLogin(), func() string {
 			return "area required"
 		})
-		r.Get("/assigned", RequireLogin(), func() string {
-			return "status required"
+		r.Get("/assigned", RequireLogin(), func(u User, db *mgo.Database) string {
+			c := db.C(TicketsC)
+			count, _ := c.Find(bson.M{"assigned_to": u.Id, "status": bson.M{"$ne": "closed"}}).Count()
+			return strconv.Itoa(count)
+			//return "status required"
 		})
 		r.Get("/department", RequireLogin(), func() string {
 			return "department required"
 		})
-		r.Get("/submitted", RequireLogin(), func() string {
-			return "status required"
+		r.Get("/submitted", RequireLogin(), func(u User, db *mgo.Database) string {
+			c := db.C(TicketsC)
+			count, _ := c.Find(bson.M{"submitter": u.Id, "status": bson.M{"$ne": "closed"}}).Count()
+			return strconv.Itoa(count)
 		})
 		r.Get("/assigned/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			c := db.C(TicketsC)
@@ -153,6 +158,19 @@ func InitTicketService(m *martini.ClassicMartini) {
 			b, _ := json.Marshal(tickets)
 
 			return string(b)
+		})
+		r.Get("/department/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			c := db.C(TicketsC)
+			var id bson.ObjectId = bson.ObjectIdHex(p["id"])
+			if !id.Valid() {
+				return "invalid department"
+			}
+			if !u.InDepartment(id) || !u.Roles.DomainAdmin {
+				return "denied"
+			}
+
+			count, _ := c.Find(bson.M{"department": id, "status": bson.M{"$ne": "closed"}}).Count()
+			return strconv.Itoa(count)
 		})
 		r.Get("/department/:id/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			c := db.C(TicketsC)

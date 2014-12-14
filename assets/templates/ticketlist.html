@@ -1,4 +1,4 @@
-<nav class="nav navbar-default hidden-xs" role="navigation">
+ <nav class="nav navbar-default hidden-xs" role="navigation">
 	<form class="navbar-form">
 		<!--
 		<p class="navbar-text">View:</p>
@@ -27,7 +27,7 @@
 		<td ng-show="options.ticket.selectable">&nbsp;</td>
 		<th ng-class="{active: order == 'Subject'}" ng-click="setOrder('Subject')">Subject</th>
 		<th ng-class="{active: order == 'Created'}" ng-click="setOrder('Created')" class="hidden-xs">Created On</th>
-		<th ng-show="options.ticket.showDepartment">
+		<th ng-show="options.ticket.showDepartment" class="hidden-xs">
 			Department
 		</th>
 		<th ng-class="{active: order == 'Category'}" ng-click="setOrder('Category')" ng-show="options.ticket.showCategory">
@@ -40,7 +40,7 @@
 			<td ng-show="options.ticket.selectable"><input type="checkbox"></td>
 			<td>{{ticket.Subject}}</td>
 			<td class="hidden-xs">{{ticket.Created | date : 'short'}}</td>
-			<td ng-show="options.ticket.showDepartment">
+			<td class="hidden-xs" ng-show="options.ticket.showDepartment">
 				{{ticket.Department | depName : this}}
 			</td>
 			<td ng-show="options.ticket.showCategory">

@@ -29,6 +29,10 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 
 			d.Id = bson.NewObjectId()
 
+			for i := 0; i < len(d.Category); i++ {
+				d.Category[i].Id = bson.NewObjectId()
+			}
+
 			c := db.C(DepartmentsC)
 			err = c.Insert(d)
 
