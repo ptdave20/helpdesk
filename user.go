@@ -159,6 +159,9 @@ func Oauth2Handler() martini.Handler {
 				}
 				gUser := GetGoogleUser(transport)
 				user := FindOrCreateUser(db, gUser)
+				if user == nil {
+					http.Redirect(w, r, "/#/error/invalid_domain", 302)
+				}
 				ses := CreateUserSession(db, *user, transport.Token())
 				s.Set("session", ses)
 				//val, _ := json.Marshal(transport.Token())
@@ -201,8 +204,9 @@ func FindOrCreateUser(db *mgo.Database, google_user GoogleUserV2) *User {
 	}
 
 	user, err = UserCreate(db, google_user)
+
 	if err != nil {
-		panic(err)
+		return nil
 	}
 	return user
 }

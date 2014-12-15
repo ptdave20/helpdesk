@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" ng-app="helpIndex">
+<html lang="en" ng-app="adminIndex">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,40 +14,39 @@
 </head>
 <body ng-controller="bCtrl">
 	<nav class="navbar nav navbar-inverse navbar-fixed-top" role="navigation">
-		<button type="button" class="navbar-toggle collapsed pull-left" ng-click="isCollapsed = !isCollapsed">
+		<button type="button" class="navbar-toggle collapsed pull-left" ng-init="isCollapsed = true" ng-click="isCollapsed = !isCollapsed">
         	<span class="sr-only">Toggle navigation</span>
         	<span class="icon-bar"></span>
         	<span class="icon-bar"></span>
         	<span class="icon-bar"></span>
       	</button>
 		<span class="navbar-brand" ng-show="isCollapsed">Helpdesk</span>
-		
       	<div class="collapse navbar-collapse" collapse="isCollapsed">
       		<ul class="nav navbar-nav">
       			<li ng-class="{active:isActive('/')}" ng-click="isCollapsed = true"><a href="#">Home</a></li>
-      			<li ng-class="{active:isActive('/domain)}" ng-click="isCollapsed = true"><a href="#/domain">Domain Settings</a></li>
-      			<li ng-class="{active:isActive('/user)}" ng-click="isCollapsed = true"><a href="#/users">Domain Users</a></li>
+      			<li ng-class="{active:isActive('/domain')}" ng-click="isCollapsed = true"><a href="#/domain">Settings</a></li>
+            <li ng-class="{active:isActive('/departments')}" ng-click="isCollapsed = true"><a href="#/departments">Departments</a></li>
+            <li ng-class="{active:isActive('/buildings')}" ng-click="isCollapsed = true"><a href="#/buildings">Buildings</a></li>
+      			<li ng-class="{active:isActive('/user')}" ng-click="isCollapsed = true"><a href="#/users">Users</a></li>
       			<li ng-click="isCollapsed = true"><a href="main.html">Back to Tickets</a></li>
       			<li>
-      				<a href="/o/logout" ng-click="isCollapsed = true">
-      					<span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out
-  					</a>
+    				  <a href="/o/logout" ng-click="isCollapsed = true">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out
+              </a>
   				</li>
       		</ul>
       	</div>
-		
 	</nav>
 	<div class="container">
 		<div ng-view></div>
 	</div>
 	
 
-	<script src="/scripts/angular/angular.js"></script>
-	<script src="/scripts/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
-	<script src="/scripts/angular/angular-route.js"></script>
+  <script src="/scripts/angular/angular.js"></script>
+  <script src="/scripts/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
+  <script src="/scripts/angular/angular-route.js"></script>
 
-	<script src="/scripts/main.js"></script>
-	<script src="/scripts/ticket.js"></script>
+	<script src="/scripts/admin.js"></script>
 	<script src="/scripts/admin_routes.js"></script>
   
 </body>

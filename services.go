@@ -10,16 +10,16 @@ import (
 )
 
 func InitializeDepartmentService(m *martini.ClassicMartini) {
-	m.Group("/o/departments", func(r martini.Router) {
-		r.Get("/list", RequireLogin(), func(db *mgo.Database) string {
-			c := db.C(DepartmentsC)
-			var d []Department
-
-			c.Find(bson.M{}).All(&d)
-			j, _ := json.Marshal(d)
-			return string(j)
+	m.Group("/o/department", func(r martini.Router) {
+		r.Get("/list", RequireLogin(), func(domain Domain, db *mgo.Database) string {
+			b, _ := json.Marshal(domain.Departments)
+			return string(b)
 		})
-		r.Post("/new", RequireLogin(), func(req *http.Request, db *mgo.Database) string {
+		r.Post("/", RequireLogin(), func(domain Domain, u User, req *http.Request, db *mgo.Database) string {
+			if !u.Roles.DomainAdmin || !u.Roles.DomainModDep {
+				return "denied"
+			}
+
 			decoder := json.NewDecoder(req.Body)
 			var d Department
 			err := decoder.Decode(&d)
@@ -33,12 +33,8 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 				d.Category[i].Id = bson.NewObjectId()
 			}
 
-			c := db.C(DepartmentsC)
-			err = c.Insert(d)
-
-			if err != nil {
-				panic(err)
-			}
+			c := db.C(DomainsC)
+			err = c.Update(bson.M{"_id": domain.Id}, bson.M{"departments": bson.M{"$push": d}})
 			return d.Id.Hex()
 		})
 		r.Post("/:id/new_category", RequireLogin(), func(req *http.Request, db *mgo.Database, p martini.Params) string {

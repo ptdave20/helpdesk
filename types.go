@@ -66,12 +66,12 @@ type (
 		KeepStats      bool          `bson:"keep_user_stats"`
 	}
 	Domain struct {
-		Id              bson.ObjectId   `bson:"_id"`
-		Name            string          `bson:"name"`
-		AcceptedDomains []string        `bson:"accepted_domains"`
-		Settings        DomainSettings  `bson:"domain_settings"`
-		Buildings       []Building      `bson:"buildings"`
-		Departments     []bson.ObjectId `bson:"departments"`
+		Id              bson.ObjectId  `bson:"_id"`
+		Name            string         `bson:"name"`
+		AcceptedDomains []string       `bson:"accepted_domains"`
+		Settings        DomainSettings `bson:"domain_settings"`
+		Buildings       []Building     `bson:"buildings"`
+		Departments     []Department   `bson:"departments"`
 	}
 	Note struct {
 		Id        bson.ObjectId `bson:"_id"`
@@ -200,10 +200,6 @@ func (d Department) GetMember(id bson.ObjectId) (*DepartmentUser, error) {
 	return nil, fmt.Errorf("Department: user %s is not a member of \"%s\"", id.Hex(), d.Name)
 }
 
-func (d *Department) GetDepartment(id bson.ObjectId, db *mgo.Database) error {
-	c := db.C(DepartmentsC)
-	return c.Find(bson.M{"_id": id}).One(&d)
-}
 func (d Department) CanEditTicket(u User, t Ticket) bool {
 	var depUser int = -1
 

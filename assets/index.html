@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <title>Helpdesk</title>
   <link rel="stylesheet" href="scripts/bootstrap/dist/css/bootstrap.css">
-  <script src="scripts/angular/angular.js"></script>
-  <script src="scripts/index.js"></script>
+  
   <style>
   	body,html {
   		padding-top: 70px;
@@ -16,11 +15,14 @@
 	<div class="navbar nav navbar-inverse navbar-fixed-top">
 		<div class="navbar-brand">Helpdesk</div>
 	</div>
-	<div class="jumbotron">
-		<div class="container">
-		<h1>Helpdesk</h1>
-		<p>In order to login, please click the login button below. You will be authenticated using your google credentials. After, you will be redirected to the helpdesk once you are authenicated.</p>
-		<a class="btn btn-primary btn-lg" href="/o/login" role="button">Login</a>
+	<div class="container">
+    <div class="jumbotron">
+      <div ng-view></div>
+  		<a class="btn btn-primary btn-lg" href="/o/login" role="button">Login</a>
 	</div>
+  <script src="scripts/angular/angular.js"></script>
+  <script src="/scripts/angular/angular-route.js"></script>
+  <script src="scripts/index.js"></script>
+  <script src="scripts/index_routes.js"></script>
 </body>
 </html>

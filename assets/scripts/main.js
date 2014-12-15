@@ -4,7 +4,7 @@ var helpdesk = angular.module('helpIndex',['ngRoute','ui.bootstrap.tpls', 'ui.bo
 helpdesk.service('DepartmentsService', function($http) {
 	function DeptListService() {
 		this.getDepartments = function() {
-			return $http.get('/o/departments/list',{withCredentials:true});
+			return $http.get('/o/department/list',{withCredentials:true});
 		}
 	}
 	var obj = new DeptListService();
