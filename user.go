@@ -26,6 +26,15 @@ func UserExists(db *mgo.Database, Id string) (*User, error) {
 }
 
 func UserCreate(db *mgo.Database, gUser GoogleUserV2) (*User, error) {
+	var dom Domain
+	d := db.C(DomainsC)
+	m := bson.M{"accepted_domains": bson.M{"$in": []string{gUser.Hd}}}
+
+	err := d.Find(m).One(&dom)
+	if err != nil {
+		// We didn't find a domain, return!
+		return nil, err
+	}
 	newUser := new(User)
 	newUser.Id = bson.NewObjectId()
 	newUser.Firstname = gUser.GivenName
@@ -35,14 +44,14 @@ func UserCreate(db *mgo.Database, gUser GoogleUserV2) (*User, error) {
 	newUser.Picture = gUser.Picture
 	newUser.FirstLogin = time.Now()
 	newUser.LastLogin = time.Now()
+	newUser.Domain = dom.Id
 	newUser.Enabled = true
 
 	col := db.C(UsersC)
-	err := col.Insert(newUser)
+	err = col.Insert(newUser)
 	if err != nil {
 		return nil, err
 	}
-
 	return newUser, nil
 }
 
@@ -50,21 +59,32 @@ func RequireLogin() martini.Handler {
 	return func(db *mgo.Database, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
 		users := db.C(UsersC)
 		user_session := db.C(SessionsC)
+		domains := db.C(DomainsC)
+
 		if s.Get("session") != nil {
 			session_id := s.Get("session")
-			u := new(User)
-			ses := new(Session)
-			err := user_session.Find(bson.M{"_id": bson.ObjectIdHex(session_id.(string))}).One(ses)
+			var u User
+			var ses Session
+			var d Domain
+
+			err := user_session.Find(bson.M{"_id": bson.ObjectIdHex(session_id.(string))}).One(&ses)
 			if err != nil {
+				println(err.Error())
 				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 			}
-			err = users.FindId(ses.UserId).One(u)
+			err = users.FindId(ses.UserId).One(&u)
 			if err != nil {
+				println(err.Error())
 				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 			}
 			if !ses.Expired() {
-				c.Map(*u)
-				c.Map(*ses)
+				err = domains.Find(bson.M{"_id": u.Domain}).One(&d)
+				if err != nil {
+					panic(err)
+				}
+				c.Map(u)
+				c.Map(ses)
+				c.Map(d)
 				c.Next()
 			} else {
 				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)

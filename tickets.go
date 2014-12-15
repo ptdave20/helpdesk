@@ -95,6 +95,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 			tkt.Id = bson.NewObjectId()
 			tkt.Submitter = u.Id
 			tkt.Status = "open"
+			tkt.Building = u.Building
 
 			tkt.Created = time.Now()
 
@@ -118,11 +119,36 @@ func InitTicketService(m *martini.ClassicMartini) {
 		r.Get("/", RequireLogin(), func() string {
 			return "area required"
 		})
+		r.Get("/building", RequireLogin(), func(u User, db *mgo.Database) string {
+			if (u.Roles.BldgViewTicket || u.Roles.DomainAdmin) && u.Building.Hex() != "" {
+				c := db.C(TicketsC)
+				var tickets []Ticket
+				c.Find(bson.M{"building": u.Building}).All(&tickets)
+				b, _ := json.Marshal(tickets)
+				return string(b)
+			} else {
+				if u.Building.Hex() == "" {
+					return "no building set for user"
+				} else if !u.Roles.BldgViewTicket {
+					return "not allowed to see tickets for building"
+				}
+			}
+			return "unknown error"
+		})
+		r.Get("/building/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			if !u.Roles.DomainAdmin || (u.Building.Hex() != p["id"] && u.Roles.BldgViewTicket) {
+				return "access denied"
+			}
+			c := db.C(TicketsC)
+			var tickets []Ticket
+			c.Find(bson.M{"building": bson.ObjectIdHex(p["id"])}).All(&tickets)
+			b, _ := json.Marshal(tickets)
+			return string(b)
+		})
 		r.Get("/assigned", RequireLogin(), func(u User, db *mgo.Database) string {
 			c := db.C(TicketsC)
 			count, _ := c.Find(bson.M{"assigned_to": u.Id, "status": bson.M{"$ne": "closed"}}).Count()
 			return strconv.Itoa(count)
-			//return "status required"
 		})
 		r.Get("/department", RequireLogin(), func() string {
 			return "department required"

@@ -12,7 +12,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">Created / Closed On</div>
 				<div class="panel-body">
-					{{ticket.Created}}
+					{{ticket.Created | date : 'short'}}
 				</div>
 			</div>
 			<div class="panel panel-default">

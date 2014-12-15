@@ -66,10 +66,12 @@ type (
 		KeepStats      bool          `bson:"keep_user_stats"`
 	}
 	Domain struct {
-		Id          bson.ObjectId   `bson:"_id"`
-		Name        string          `bson:"domain"`
-		Buildings   []Building      `bson:"buildings"`
-		Departments []bson.ObjectId `bson:"departments"`
+		Id              bson.ObjectId   `bson:"_id"`
+		Name            string          `bson:"name"`
+		AcceptedDomains []string        `bson:"accepted_domains"`
+		Settings        DomainSettings  `bson:"domain_settings"`
+		Buildings       []Building      `bson:"buildings"`
+		Departments     []bson.ObjectId `bson:"departments"`
 	}
 	Note struct {
 		Id        bson.ObjectId `bson:"_id"`
