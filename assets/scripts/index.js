@@ -2,6 +2,7 @@ var indexApp = angular.module('helpIndex',['ngRoute'])
 
 indexApp.controller('bCtrl', function ($scope,$http) {
 	$http.get('/o/user/logged_in',{withCredentials:true}).success(function(data) {
+		console.log(data);
 		if(data["result"]) {
 			window.location = "/main.html";
 		} else {

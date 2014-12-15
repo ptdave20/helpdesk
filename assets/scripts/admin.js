@@ -7,8 +7,21 @@ admin.controller('bCtrl', function ($scope,$http) {
 admin.controller('depCtrl', function($scope,$http) {
 	$scope.newDep = {};
 	$scope.departments = [];
-	$scope.addDepartment = function() {
-		$scope.departments.push($scope.newDep);
-		$scope.newDep = {};
+
+	$scope.getDepartments = function() {
+		$http.get('/o/department/list',{withCredentials:true}).success(function(data) {
+			$scope.departments = data;
+		});
 	}
+
+	$scope.addDepartment = function() {
+		$http.post('/o/department',$scope.newDep,{withCredentials:true}).success(function(data) {
+			$scope.getDepartments();
+			$scope.newDep = {};
+		});
+		//$scope.departments.push($scope.newDep);
+		
+	}
+
+	$scope.getDepartments();
 })

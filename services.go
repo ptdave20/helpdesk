@@ -15,7 +15,7 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			b, _ := json.Marshal(domain.Departments)
 			return string(b)
 		})
-		r.Post("/", RequireLogin(), func(domain Domain, u User, req *http.Request, db *mgo.Database) string {
+		r.Post("", RequireLogin(), func(domain Domain, u User, req *http.Request, db *mgo.Database) string {
 			if !u.Roles.DomainAdmin || !u.Roles.DomainModDep {
 				return "denied"
 			}
@@ -34,10 +34,15 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			}
 
 			c := db.C(DomainsC)
-			err = c.Update(bson.M{"_id": domain.Id}, bson.M{"departments": bson.M{"$push": d}})
+			err = c.Update(bson.M{"_id": domain.Id}, bson.M{"$push": bson.M{"departments": d}})
+			//err = c.UpdateId(domain.Id, bson.M{"departments": bson.M{"$addToSet": d}})
+			//err = c.Update(bson.M{"_id": domain.Id}, bson.M{"departments": bson.M{"$push": d}})
+			if err != nil {
+				panic(err)
+			}
 			return d.Id.Hex()
 		})
-		r.Post("/:id/new_category", RequireLogin(), func(req *http.Request, db *mgo.Database, p martini.Params) string {
+		r.Post("/:id", RequireLogin(), func(req *http.Request, db *mgo.Database, p martini.Params) string {
 			return ""
 		})
 	})
