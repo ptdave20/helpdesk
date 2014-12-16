@@ -1,25 +1,23 @@
-<div class="container">
-	<div class="panel panel-info">
-		<div class="panel-heading">New Department</div>
-		<div class="panel-body">
+<div class="panel panel-primary">
+	<div class="panel-heading">Departments</div>
+	<table class="table">
+		<tfoot>
 			<form role="form">
-				<div class="col-md-11 col-xs-9">
-					<input type="text" class="form-control" id="departmentName" ng-model="newDep.Name" placeholder="Department Name">
-				</div>
-				<div class="col-md-1 col-xs-2">
-					<button ng-click="addDepartment()" role="button" class="btn btn-success"><span class="glyphicon glyphicon-plus"></button>
-				</div>
+				<td>
+					<input type="text" class="form-control" id="departmentName" ng-model="newDep.Name" placeholder="New Department Name">
+				</td>
+				<td align="right">
+					<button ng-click="addDepartment()" role="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus"></button>
+				</td>
 			</form>
-		</div>
-	</div>
-	<div ng-repeat="dep in departments">
-		<div class="panel panel-default">
-			<div class="panel-heading">{{dep.Name}}</div>
-			<div class="panel-body">
-				<ul>
-					<li ng-repeat="cat in dep.Category">{[cat.Name}}</li>
-				</ul>
-			</div>
-		</div>
-	</div>
+		</tfoot>
+		<tr ng-repeat="dep in departments">
+			<td>{{dep.Name}}</td>
+			<td align="right">
+				<a href="#/department/reports/{{dep.Id}}" role="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-info-sign"><a>
+				<a href="#/department/tickets/{{dep.Id}}" role="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-list"></a>
+				<a href="#/department/config/{{dep.Id}}" role="button" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench"></a>
+			</td>
+		</tr>
+	</table>	
 </div>

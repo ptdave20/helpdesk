@@ -59,8 +59,6 @@ type (
 		UserRole Role `bson:"user_roles"`
 	}
 	DomainSettings struct {
-		Id             bson.ObjectId `bson:"_id"`
-		DomainId       bson.ObjectId `bson:"domain_id"`
 		Defaults       DomainDefault `bson:"domain_defaults"`
 		EmailTemplates EmailTemplate `bson:"email_templates"`
 		KeepStats      bool          `bson:"keep_user_stats"`
@@ -70,8 +68,8 @@ type (
 		Name            string         `bson:"name"`
 		AcceptedDomains []string       `bson:"accepted_domains"`
 		Settings        DomainSettings `bson:"domain_settings"`
-		Buildings       []Building     `bson:"buildings"`
-		Departments     []Department   `bson:"departments"`
+		Buildings       []Building     `bson:"buildings,omitempty"`
+		Departments     []Department   `bson:"departments,omitempty"`
 	}
 	Note struct {
 		Id        bson.ObjectId `bson:"_id"`

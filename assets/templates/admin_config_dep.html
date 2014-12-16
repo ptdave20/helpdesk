@@ -1,0 +1,23 @@
+<div class="panel panel-default">
+	<div class="panel-heading"><h4>{{dep.Name}}</h4></div>
+	<form role="form">
+		<div class="panel-body">
+			<div class="form-group">
+				<label for="depName">Department Name</label>
+				<input type="text" class="form-control" id="depName" placeholder="Department Name" ng-model="dep.Name">
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="depSpecBuilding" ng-model="dep.IsBuildingSpecific" value="true">
+					 Is Building Specific?
+				</label>
+			</div>
+			<div class="form-group" ng-show="dep.IsBuildingSpecific">
+				<label for="depBuilding">Building</label>
+				<select id="depBuilding" class="form-control" ng-model="dep.Building">
+					<option value="">Unspecified</option>
+				</select>
+			</div>
+		</div>
+	</form>
+</div>
