@@ -8,7 +8,8 @@ admin
 		template: '<h1>Settings</h1>'
 	})
 	.when('/buildings', {
-		template: '<h1>Buildings</h1>'
+		templateUrl: '/templates/admin_buildings.html',
+		controller: 'bldgCtrl'
 	})
 	.when('/departments', {
 		templateUrl: '/templates/admin_departments.html',

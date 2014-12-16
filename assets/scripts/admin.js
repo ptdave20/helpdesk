@@ -63,4 +63,20 @@ admin.controller('depConfigCtrl', ['$scope','$routeParams','$http', function($sc
 	$http.get('/o/department/'+id,{withCredentials:true}).success(function(data) {
 		$scope.dep = data;
 	});
-}])
+}]);
+
+admin.controller('bldgCtrl', ['$scope','$http', function($scope,$http) {
+	$scope.newBldg = {}
+	$scope.addBuilding = function() {
+		$http.post('/o/domain/building',$scope.newBldg, {withCredentials:true}).success(function(data) {
+			$scope.newBldg = {};
+			$scope.getBuildings();
+		});
+	}
+	$scope.getBuildings = function() {
+		$http.get('/o/domain/buildings', {withCredentials:true}).success(function(data) {
+			$scope.buildings = data;
+		});
+	}
+	$scope.getBuildings();
+}]);

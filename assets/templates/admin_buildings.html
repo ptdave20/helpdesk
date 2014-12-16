@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+	<div class="panel-heading">Buildings</div>
+	<table class="table">
+		<tfoot>
+			<form role="form">
+				<td><input type="text" placeholder="New Building Name" class="form-control" ng-model="newBldg.Name"></td>
+				<td align="right">
+					<button ng-click="addBuilding()" role="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus"></button>
+				</td>
+			</form>
+		</tfoot>
+		<tbody>
+			<tr ng-repeat="bldg in buildings">
+				<td>{{bldg.Name}}</td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -11,7 +11,7 @@ import (
 
 func InitializeDepartmentService(m *martini.ClassicMartini) {
 	m.Group("/o/domain", func(r martini.Router) {
-		r.Get("/o/buildings", RequireLogin(), func(domain Domain) string {
+		r.Get("/buildings", RequireLogin(), func(domain Domain) string {
 			b, _ := json.Marshal(domain.Buildings)
 			return string(b)
 		})
@@ -22,6 +22,7 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			decoder := json.NewDecoder(req.Body)
 			var building Building
 			decoder.Decode(&building)
+			building.Id = bson.NewObjectId()
 			c := db.C(DomainsC)
 			err := c.UpdateId(domain.Id, bson.M{"$push": bson.M{"buildings": building}})
 			if err != nil {
