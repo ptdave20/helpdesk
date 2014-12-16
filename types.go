@@ -110,6 +110,7 @@ type (
 	}
 	Ticket struct {
 		Id          bson.ObjectId `bson:"_id"`
+		Domain      bson.ObjectId `bson:"domain-id"`
 		Submitter   bson.ObjectId `bson:"submitter,omitempty"`
 		AssignedTo  bson.ObjectId `bson:"assigned_to,omitempty"`
 		Building    bson.ObjectId `bson:"building,omitempty"`

@@ -82,7 +82,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 			return ""
 		})
 		// If a ticket is sent to us on the root of /o/ticket using POST, they are trying to add a ticket
-		r.Post("/", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
+		r.Post("/", RequireLogin(), func(domain Domain, u User, db *mgo.Database, req *http.Request) string {
 			d := json.NewDecoder(req.Body)
 
 			var tkt Ticket
@@ -96,6 +96,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 			tkt.Submitter = u.Id
 			tkt.Status = "open"
 			tkt.Building = u.Building
+			tkt.Domain = domain.Id
 
 			tkt.Created = time.Now()
 

@@ -10,6 +10,38 @@ import (
 )
 
 func InitializeDepartmentService(m *martini.ClassicMartini) {
+	m.Group("/o/domain", func(r martini.Router) {
+		r.Get("/o/buildings", RequireLogin(), func(domain Domain) string {
+			b, _ := json.Marshal(domain.Buildings)
+			return string(b)
+		})
+		r.Post("/building", RequireLogin(), func(domain Domain, user User, db *mgo.Database, req *http.Request) string {
+			if !user.Roles.DomainAdmin || !user.Roles.DomainModBldg {
+				return "denied"
+			}
+			decoder := json.NewDecoder(req.Body)
+			var building Building
+			decoder.Decode(&building)
+			c := db.C(DomainsC)
+			err := c.UpdateId(domain.Id, bson.M{"$push": bson.M{"buildings": building}})
+			if err != nil {
+				panic(err)
+			}
+			return "success"
+		})
+		r.Delete("/building/:id", RequireLogin(), func(domain Domain, user User, db *mgo.Database, req *http.Request, p martini.Params) string {
+			if !user.Roles.DomainAdmin || !user.Roles.DomainModBldg {
+				return "denied"
+			}
+			id := bson.ObjectIdHex(p["id"])
+			c := db.C(DomainsC)
+			err := c.UpdateId(domain.Id, bson.M{"$pull": bson.M{"buildings": bson.M{"_id": id}}})
+			if err != nil {
+				panic(err)
+			}
+			return "success"
+		})
+	})
 	m.Group("/o/department", func(r martini.Router) {
 		r.Get("/list", RequireLogin(), func(domain Domain, db *mgo.Database) string {
 			b, _ := json.Marshal(domain.Departments)
