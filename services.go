@@ -30,6 +30,21 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			}
 			return "success"
 		})
+		r.Post("/building/:id", RequireLogin(), func(domain Domain, user User, db *mgo.Database, req *http.Request, p martini.Params) string {
+			if !user.Roles.DomainAdmin || !user.Roles.DomainModBldg {
+				return "denied"
+			}
+			id := bson.ObjectIdHex(p["id"])
+			var bldg Building
+			dec := json.NewDecoder(req.Body)
+			dec.Decode(&bldg)
+			c := db.C(DomainsC)
+			err := c.Update(bson.M{"_id": domain.Id, "buildings._id": id}, bson.M{"$set": bson.M{"buildings.$": bldg}})
+			if err != nil {
+				panic(err)
+			}
+			return "success"
+		})
 		r.Delete("/building/:id", RequireLogin(), func(domain Domain, user User, db *mgo.Database, req *http.Request, p martini.Params) string {
 			if !user.Roles.DomainAdmin || !user.Roles.DomainModBldg {
 				return "denied"
@@ -84,6 +99,29 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			return "not found"
 		})
 		r.Post("/:id", RequireLogin(), func(domain Domain, u User, req *http.Request, db *mgo.Database, p martini.Params) string {
+			if !u.Roles.DomainAdmin || !u.Roles.DomainModDep {
+				return "denied"
+			}
+			id := bson.ObjectIdHex(p["id"])
+			if !id.Valid() {
+				return "invalid id"
+			}
+
+			// Pull in the incoming department data
+			decoder := json.NewDecoder(req.Body)
+			var incDep DepartmentUpdate
+			decoder.Decode(&incDep)
+
+			c := db.C(DomainsC)
+			err := c.Update(
+				bson.M{"_id": domain.Id, "$elemMatch": bson.M{"departments": bson.M{"_id": id}}},
+				bson.M{"$set": bson.M{"departments.$.name": incDep.Name, "departments.$.is_building_specific": incDep.IsBuildingSpecific, "departments.$.building": incDep.Building}})
+			if err != nil {
+				panic(err)
+			}
+			return "success"
+		})
+		r.Post("/:id/category", RequireLogin(), func(domain Domain, u User, req *http.Request, db *mgo.Database, p martini.Params) string {
 			if !u.Roles.DomainAdmin || !u.Roles.DomainModDep {
 				return "denied"
 			}

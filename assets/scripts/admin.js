@@ -33,7 +33,7 @@ admin.controller('depCtrl', function($scope,$http) {
 	$scope.addCategory = function(depId, cat) {
 		var cat_data = {
 			Name : cat
-		}
+		};
 		$http.post('/o/department/'+depId,cat_data,{withCredentials:true}).success(function(data) {
 			$scope.getDepartments();
 		});
@@ -56,20 +56,32 @@ admin.controller('depCtrl', function($scope,$http) {
 	}
 
 	$scope.getDepartments();
-})
+});
 
 admin.controller('depConfigCtrl', ['$scope','$routeParams','$http', function($scope,$routeParams,$http){
 	var id = $routeParams.id;
 	$http.get('/o/department/'+id,{withCredentials:true}).success(function(data) {
 		$scope.dep = data;
 	});
+	$scope.getBuildings = function() {
+		$http.get('/o/domain/buildings', {withCredentials:true}).success(function(data) {
+			$scope.buildings = data;
+		});
+	}
+
+
+	$scope.save = function() {
+		
+	}
+
+	$scope.getBuildings();
 }]);
 
 admin.controller('bldgCtrl', ['$scope','$http', function($scope,$http) {
 	$scope.newBldg = {}
 	$scope.addBuilding = function() {
 		$http.post('/o/domain/building',$scope.newBldg, {withCredentials:true}).success(function(data) {
-			$scope.newBldg = {};
+			$scope.newBldg = {}
 			$scope.getBuildings();
 		});
 	}
@@ -78,5 +90,6 @@ admin.controller('bldgCtrl', ['$scope','$http', function($scope,$http) {
 			$scope.buildings = data;
 		});
 	}
+
 	$scope.getBuildings();
 }]);

@@ -93,8 +93,13 @@ type (
 		Name               string           `bson:"name"`
 		Category           []Category       `bson:"category,omitempty"`
 		IsBuildingSpecific bool             `bson:"is_building_specific"`
-		Building           bson.ObjectId    `bson:"visible_to,omitempty"`
+		Building           bson.ObjectId    `bson:"building,omitempty"`
 		Users              []DepartmentUser `bson:"department_users,omitempty"`
+	}
+	DepartmentUpdate struct {
+		Name               string        `json:"Name"`
+		IsBuildingSpecific bool          `json:"IsBuildingSpecific"`
+		Building           bson.ObjectId `json:"Building"`
 	}
 	Document struct {
 		Id        bson.ObjectId `bson:"_id"`
