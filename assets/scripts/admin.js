@@ -71,7 +71,14 @@ admin.controller('depConfigCtrl', ['$scope','$routeParams','$http', function($sc
 
 
 	$scope.save = function() {
-		
+		var upd = {
+			Name: $scope.dep.Name,
+			IsBuildingSpecific: $scope.dep.IsBuildingSpecific,
+			Building: $scope.dep.Building
+		}
+		$http.post('/o/department/'+id,upd,{withCredentials:true}).success(function() {
+
+		});
 	}
 
 	$scope.getBuildings();

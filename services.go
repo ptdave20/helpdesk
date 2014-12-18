@@ -114,7 +114,7 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 
 			c := db.C(DomainsC)
 			err := c.Update(
-				bson.M{"_id": domain.Id, "$elemMatch": bson.M{"departments": bson.M{"_id": id}}},
+				bson.M{"_id": domain.Id, "departments._id": id},
 				bson.M{"$set": bson.M{"departments.$.name": incDep.Name, "departments.$.is_building_specific": incDep.IsBuildingSpecific, "departments.$.building": incDep.Building}})
 			if err != nil {
 				panic(err)

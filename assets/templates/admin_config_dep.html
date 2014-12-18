@@ -16,12 +16,12 @@
 				<label for="depBuilding">Building</label>
 				<select id="depBuilding" class="form-control" ng-model="dep.Building">
 					<option value="">Unspecified</option>
-					<option ng-repeat="building in buildings" value="building.Id">{{building.Name}}</option>
+					<option ng-repeat="building in buildings" value="{{building.Id}}">{{building.Name}}</option>
 				</select>
 			</div>
 		</div>
 		<div class="panel-footer">
-			<button role="button" class="btn btn-success" ng-click="save()">Save</button>
+			<button role="button" class="btn btn-success" ng-click="save()">Save</button> <a role="button" class="btn btn-warning" href="#/departments">Cancel</a>
 		</div>
 	</form>
 </div>
