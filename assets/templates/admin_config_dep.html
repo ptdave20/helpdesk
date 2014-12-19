@@ -2,26 +2,56 @@
 	<div class="panel-heading"><h4>{{dep.Name}}</h4></div>
 	<form role="form">
 		<div class="panel-body">
-			<div class="form-group">
-				<label for="depName">Department Name</label>
-				<input type="text" class="form-control" id="depName" placeholder="Department Name" ng-model="dep.Name">
+			<div class="col-md-6">
+				<div class="form-group">
+					<label for="depName">Department Name</label>
+					<input type="text" class="form-control" id="depName" placeholder="Department Name" ng-model="dep.Name">
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="depSpecBuilding" ng-model="dep.IsBuildingSpecific" value="true">
+						 Is Building Specific?
+					</label>
+				</div>
+				<div class="form-group" ng-show="dep.IsBuildingSpecific">
+					<label for="depBuilding">Building</label>
+					<select id="depBuilding" class="form-control" ng-model="dep.Building">
+						<option value="">Unspecified</option>
+						<option ng-repeat="building in buildings" value="{{building.Id}}">{{building.Name}}</option>
+					</select>
+				</div>
 			</div>
-			<div class="checkbox">
-				<label>
-					<input type="checkbox" id="depSpecBuilding" ng-model="dep.IsBuildingSpecific" value="true">
-					 Is Building Specific?
-				</label>
-			</div>
-			<div class="form-group" ng-show="dep.IsBuildingSpecific">
-				<label for="depBuilding">Building</label>
-				<select id="depBuilding" class="form-control" ng-model="dep.Building">
-					<option value="">Unspecified</option>
-					<option ng-repeat="building in buildings" value="{{building.Id}}">{{building.Name}}</option>
-				</select>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label>Categories</label>
+					<table class="table">
+						<tbody>
+							<tr ng-repeat="cat in dep.Category">
+								<td>{{cat.Name}}</td>
+								<td align="right">
+									<button class="btn btn-danger" role="button" ng-click="delCategory(cat.Id)">
+										<span class="glyphicon glyphicon-minus"></span>
+									</button>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="text" class="form-control" ng-model="newCatName" placeholder="New Category">
+								</td>
+								<td align="right">
+									<button class="btn btn-success" role="button" ng-click="addCat()">
+										<span class="glyphicon glyphicon-plus"></span>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 		<div class="panel-footer">
-			<button role="button" class="btn btn-success" ng-click="save()">Save</button> <a role="button" class="btn btn-warning" href="#/departments">Cancel</a>
+			<button role="button" class="btn btn-success" ng-click="save()">Save</button> 
+			<a role="button" class="btn btn-warning" href="#/departments">Cancel</a>
 		</div>
 	</form>
 </div>

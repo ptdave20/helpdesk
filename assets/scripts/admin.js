@@ -60,12 +60,19 @@ admin.controller('depCtrl', function($scope,$http) {
 
 admin.controller('depConfigCtrl', ['$scope','$routeParams','$http', function($scope,$routeParams,$http){
 	var id = $routeParams.id;
-	$http.get('/o/department/'+id,{withCredentials:true}).success(function(data) {
-		$scope.dep = data;
-	});
+
+	$scope.newCats = [];
+	
 	$scope.getBuildings = function() {
 		$http.get('/o/domain/buildings', {withCredentials:true}).success(function(data) {
 			$scope.buildings = data;
+			$scope.getDepartment();
+		});
+	}
+
+	$scope.getDepartment = function() {
+		$http.get('/o/department/'+id,{withCredentials:true}).success(function(data) {
+			$scope.dep = data;
 		});
 	}
 
@@ -79,6 +86,13 @@ admin.controller('depConfigCtrl', ['$scope','$routeParams','$http', function($sc
 		$http.post('/o/department/'+id,upd,{withCredentials:true}).success(function() {
 
 		});
+	}
+
+	$scope.addCat = function() {
+		var newCat = {
+			Id:""
+			Name: $scope.newCatName
+		}
 	}
 
 	$scope.getBuildings();
