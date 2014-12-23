@@ -5,17 +5,17 @@
 			<div class="col-md-6">
 				<div class="form-group">
 					<label for="depName">Department Name</label>
-					<input type="text" class="form-control" id="depName" placeholder="Department Name" ng-model="dep.Name">
+					<input type="text" class="form-control" id="depName" placeholder="Department Name" ng-model="dep.Name" ng-change="nameChange=true">
 				</div>
 				<div class="checkbox">
 					<label>
-						<input type="checkbox" id="depSpecBuilding" ng-model="dep.IsBuildingSpecific" value="true">
+						<input type="checkbox" id="depSpecBuilding" ng-model="dep.IsBuildingSpecific" ng-change="buildingSpecChange = true" value="true">
 						 Is Building Specific?
 					</label>
 				</div>
 				<div class="form-group" ng-show="dep.IsBuildingSpecific">
 					<label for="depBuilding">Building</label>
-					<select id="depBuilding" class="form-control" ng-model="dep.Building">
+					<select id="depBuilding" class="form-control" ng-model="dep.Building" ng-change="buildingChange = true">
 						<option value="">Unspecified</option>
 						<option ng-repeat="building in buildings" value="{{building.Id}}">{{building.Name}}</option>
 					</select>
@@ -29,7 +29,7 @@
 							<tr ng-repeat="cat in dep.Category">
 								<td>{{cat.Name}}</td>
 								<td align="right">
-									<button class="btn btn-danger" role="button" ng-click="delCategory(cat.Id)">
+									<button class="btn btn-danger" role="button" ng-click="delCat(cat)">
 										<span class="glyphicon glyphicon-minus"></span>
 									</button>
 								</td>
@@ -50,7 +50,7 @@
 			</div>
 		</div>
 		<div class="panel-footer">
-			<button role="button" class="btn btn-success" ng-click="save()">Save</button> 
+			<button role="button" class="btn btn-success" ng-disabled="noChanges()" ng-click="save()">Save</button> 
 			<a role="button" class="btn btn-warning" href="#/departments">Cancel</a>
 		</div>
 	</form>

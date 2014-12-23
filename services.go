@@ -113,13 +113,30 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			decoder.Decode(&incDep)
 
 			c := db.C(DomainsC)
-			err := c.Update(
-				bson.M{"_id": domain.Id, "departments._id": id},
-				bson.M{"$set": bson.M{"departments.$.name": incDep.Name, "departments.$.is_building_specific": incDep.IsBuildingSpecific, "departments.$.building": incDep.Building}})
-			if err != nil {
-				panic(err)
+			if incDep.Building.Valid() {
+				err := c.Update(
+					bson.M{"_id": domain.Id, "departments._id": id},
+					bson.M{"$set": bson.M{"departments.$.name": incDep.Name, "departments.$.is_building_specific": incDep.IsBuildingSpecific, "departments.$.building": incDep.Building}})
+				if err != nil {
+					panic(err)
+				}
+				return "success"
+			} else {
+				err := c.Update(
+					bson.M{"_id": domain.Id, "departments._id": id},
+					bson.M{"$set": bson.M{"departments.$.name": incDep.Name, "departments.$.is_building_specific": incDep.IsBuildingSpecific}})
+				if err != nil {
+					panic(err)
+				}
+				err = c.Update(
+					bson.M{"_id": domain.Id, "departments._id": id},
+					bson.M{"$unset": bson.M{"departments.$.building": ""}})
+				if err != nil {
+					panic(err)
+				}
+				return "success"
 			}
-			return "success"
+
 		})
 		r.Post("/:id/category", RequireLogin(), func(domain Domain, u User, req *http.Request, db *mgo.Database, p martini.Params) string {
 			if !u.Roles.DomainAdmin || !u.Roles.DomainModDep {
@@ -185,7 +202,7 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 
 			c := db.C(DomainsC)
 
-			err := c.Update(bson.M{"_id": domain.Id}, bson.M{"$pull": bson.M{"departments.$.category": bson.M{"_id": cat}}})
+			err := c.Update(bson.M{"_id": domain.Id, "departments._id": id, "departments.category._id": cat}, bson.M{"$pull": bson.M{"departments.$.category": bson.M{"_id": cat}}})
 			if err != nil {
 				panic(err)
 			}
