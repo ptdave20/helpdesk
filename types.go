@@ -162,11 +162,16 @@ type (
 		Department []bson.ObjectId `bson:"department,omitempty"`
 		Building   bson.ObjectId   `bson:"location,omitempty"`
 
+		NewUser bool `bson:"new_user"`
+
 		GoogleId  string `bson:"google_id"`
 		Firstname string `bson:"firstname"`
 		Lastname  string `bson:"lastname"`
 		Email     string `bson:"email"`
 		Picture   string `bson:"picture"`
+		Room      string `bson:"room"`
+		Phone     string `bson:"phone"`
+		Extension string `bson:"extension"`
 
 		Enabled bool `bson:"enabled"`
 
