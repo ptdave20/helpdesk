@@ -104,6 +104,20 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		$scope.hasAssigned = data.data > 0;
 	});
 
+	$http.get('/o/user/me',{withCredentials:true}).success(function(data) {
+		$scope.user = data;
+		if($scope.user.NewUser) {
+			var modalInstance = $modal.open({
+				templateUrl: '/templates/new_user.html',
+				controller: 'userModal',
+				backdrop: 'static',
+				resolve: {
+					
+				}
+			})
+		}
+	});
+
 	$scope.openTicket = function(ticketId) {
 		var modalInstance = $modal.open({
 			templateUrl: 'ticketViewModal.html',

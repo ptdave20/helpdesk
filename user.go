@@ -231,27 +231,5 @@ func GetUserById(db *mgo.Database, id string) *User {
 }
 
 func InitializeUserService(m *martini.ClassicMartini) {
-	m.Group("/o/user", func(r martini.Router) {
-		r.Get("/logged_in", RequireLoginNoRedirectOutResult())
-		r.Get("/list", RequireLogin(), func(db *mgo.Database) string {
-			var users []User
-			c := db.C(UsersC)
-			c.Find(bson.M{}).All(&users)
-			b, _ := json.Marshal(&users)
-			return string(b)
-		})
-		r.Get("/me", RequireLogin(), func(u User) string {
-			b, err := u.Marshal()
-			if err != nil {
-				panic(err)
-			}
-			return string(b)
-		})
-		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
-			u := GetUserById(db, p["id"])
-			b, _ := u.Marshal()
-			return string(b)
-		})
 
-	})
 }
