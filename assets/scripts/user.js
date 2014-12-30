@@ -11,10 +11,15 @@ angular.module('helpIndex').controller('userModal',['$scope','$http','$modalInst
 	});
 
 	$scope.saveProfile = function() {
-		if($scope.user.Building=="") {
-
+		if($scope.user.Firstname=="" || $scope.user.Firstname==null) {
+			return;
 		}
-
+		if($scope.user.Lastname=="" || $scope.user.Lastname==null) {
+			return;
+		}
+		if($scope.user.Building=="" || $scope.user.Building==null) {
+			return;
+		}
 
 		$http.post('/o/user/me', $scope.user, {withCredentials:true}).success(function(data) {
 			if(data == "success") {
