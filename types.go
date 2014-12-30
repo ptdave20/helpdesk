@@ -157,34 +157,42 @@ type (
 		oauth2.Token
 	}
 	User struct {
-		Id         bson.ObjectId   `bson:"_id,omitempty"`
-		Domain     bson.ObjectId   `bson:"domain_id,omitempty"`
-		Department []bson.ObjectId `bson:"department,omitempty"`
-		Building   bson.ObjectId   `bson:"location,omitempty"`
+		Id         bson.ObjectId   `bson:"_id,omitempty",json:"omitempty"`
+		Domain     bson.ObjectId   `bson:"domain_id,omitempty",json:"omitempty"`
+		Department []bson.ObjectId `bson:"department,omitempty",json:"omitempty"`
+		Building   bson.ObjectId   `bson:"location,omitempty",json:"omitempty"`
 
-		NewUser bool `bson:"new_user"`
+		NewUser bool `bson:"new_user",json:"omitempty"`
 
-		GoogleId  string `bson:"google_id"`
-		Firstname string `bson:"firstname"`
-		Lastname  string `bson:"lastname"`
-		Email     string `bson:"email"`
-		Picture   string `bson:"picture"`
-		Room      string `bson:"room"`
-		Phone     string `bson:"phone"`
-		Extension string `bson:"extension"`
+		GoogleId  string `bson:"google_id",json:"omitempty"`
+		Firstname string `bson:"firstname",json:"omitempty"`
+		Lastname  string `bson:"lastname",json:"omitempty"`
+		Email     string `bson:"email",json:"omitempty"`
+		Picture   string `bson:"picture",json:"omitempty"`
+		Room      string `bson:"room",json:"omitempty"`
+		Phone     string `bson:"phone",json:"omitempty"`
+		Extension string `bson:"extension",json:"omitempty"`
 
-		Enabled bool `bson:"enabled"`
+		Enabled bool `bson:"enabled",json:"omitempty"`
 
-		Roles Role `bson:"role"`
+		Roles Role `bson:"role",json:"omitempty"`
 
-		FirstLogin time.Time `bson:"first_login"`
-		LastLogin  time.Time `bson:"last_login"`
-		RolesSet   time.Time `bson:"role_set"`
+		FirstLogin time.Time `bson:"first_login",json:"omitempty"`
+		LastLogin  time.Time `bson:"last_login",json:"omitempty"`
+		RolesSet   time.Time `bson:"role_set",json:"omitempty"`
 
-		TicketStats []TicketCount   `bson:"ticket_count"`
-		Submitted   []bson.ObjectId `bson:"submitted"`
+		TicketStats []TicketCount   `bson:"ticket_count",json:"omitempty"`
+		Submitted   []bson.ObjectId `bson:"submitted",json:"omitempty"`
 	}
-
+	UserUpdate struct {
+		Firstname string
+		Lastname  string
+		Email     string
+		Room      string
+		Phone     string
+		Extension string
+		Building  bson.ObjectId
+	}
 	GoogleUserV2 struct {
 		Id            string `json:"id,omitempty"`
 		Email         string `json:"email,omitempty"`

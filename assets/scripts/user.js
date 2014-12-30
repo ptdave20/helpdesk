@@ -11,6 +11,20 @@ angular.module('helpIndex').controller('userModal',['$scope','$http','$modalInst
 	});
 
 	$scope.saveProfile = function() {
+		if($scope.user.Building=="") {
 
+		}
+
+
+		$http.post('/o/user/me', $scope.user, {withCredentials:true}).success(function(data) {
+			if(data == "success") {
+				$modalInstance.close(true);
+			}
+		});
+	}
+	$scope.cancel = function() {
+		if(!$scope.user.NewUser) {
+			$modalInstance.close(true);
+		}
 	}
 }]);

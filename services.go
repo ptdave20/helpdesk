@@ -208,45 +208,53 @@ func InitializeDepartmentService(m *martini.ClassicMartini) {
 			}
 			return "success"
 		})
-		m.Group("/o/user", func(r martini.Router) {
-			r.Get("/logged_in", RequireLoginNoRedirectOutResult())
-			r.Get("/list", RequireLogin(), func(db *mgo.Database) string {
-				var users []User
-				c := db.C(UsersC)
-				c.Find(bson.M{}).All(&users)
-				b, _ := json.Marshal(&users)
-				return string(b)
-			})
-			r.Get("/me", RequireLogin(), func(u User) string {
-				b, err := u.Marshal()
-				if err != nil {
-					panic(err)
-				}
-				return string(b)
-			})
-			r.Post("/me", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
-				var user User
-				u.NewUser = false
-				u.Building = user.Building
-				u.Email = user.Email
-				u.Lastname = user.Lastname
-				u.Firstname = user.Firstname
-				u.Extension = user.Extension
-				u.Phone = user.Phone
-
-				c := db.C(UsersC)
-				err := c.UpdateId(u.Id, u)
-				if err != nill {
-					panic(err)
-				}
-				return "success"
-			})
-			r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
-				u := GetUserById(db, p["id"])
-				b, _ := u.Marshal()
-				return string(b)
-			})
-
+	})
+	m.Group("/o/user", func(r martini.Router) {
+		r.Get("/logged_in", RequireLoginNoRedirectOutResult())
+		r.Get("/list", RequireLogin(), func(db *mgo.Database) string {
+			var users []User
+			c := db.C(UsersC)
+			c.Find(bson.M{}).All(&users)
+			b, _ := json.Marshal(&users)
+			return string(b)
 		})
+		r.Get("/me", RequireLogin(), func(u User) string {
+			b, err := u.Marshal()
+			if err != nil {
+				panic(err)
+			}
+			return string(b)
+		})
+		r.Post("/me", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
+			var user User
+
+			d := json.NewDecoder(req.Body)
+			err := d.Decode(&user)
+			if err != nil {
+				panic(err)
+			}
+
+			u.NewUser = false
+			u.Building = user.Building
+			u.Email = user.Email
+			u.Lastname = user.Lastname
+			u.Firstname = user.Firstname
+			u.Extension = user.Extension
+			u.Phone = user.Phone
+
+			c := db.C(UsersC)
+			err = c.UpdateId(u.Id, u)
+			if err != nil {
+				panic(err)
+			}
+
+			return "success"
+		})
+		r.Get("/:id", RequireLogin(), func(db *mgo.Database, p martini.Params) string {
+			u := GetUserById(db, p["id"])
+			b, _ := u.Marshal()
+			return string(b)
+		})
+
 	})
 }
