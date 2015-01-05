@@ -33,10 +33,15 @@
       				<a href="#" class="dropdown-toggle" data-toggle="dropdown" dropdown-toggle role="button" aria-expanded="false">
       					<span class="glyphicon glyphicon-tags hidden-xs" aria-hidden="true"></span> <span class="visible-xs">Tickets</span> <span class="caret"></span>
       				</a>
-      				<ul class="dropdown-menu" role="menu">
+      				<ul class="dropdown-menu" role="menu" ng-show="user.Roles.BldgViewTicket || user.Department">
       					<li>
-      						<a href="#/tickets/mine" ng-click="isCollapsed = true">
-      							Mine
+      						<a href="#/tickets/assigned" ng-click="isCollapsed = true">
+      							Assigned
+      						</a>
+      					</li>
+      					<li ng-show="user.Roles.BldgViewTicket">
+      						<a href="#/tickets/building" ng-click="isCollapsed = true">
+      							Building
       						</a>
       					</li>
       					<li ng-show="user.Department.length || user.Roles.DomainAdmin" ng-click="isCollapsed = true">
@@ -44,11 +49,7 @@
       							Departments
       						</a>
       					</li>
-      					<li ng-show="hasAssigned">
-      						<a href="#/tickets/assigned" ng-click="isCollapsed = true">
-      							Assigned
-      						</a>
-      					</li>
+      					<li role="presentation" class="divider"></li>
       					<li>
       						<a ng-click="newTicket()" ng-click="isCollapsed = true">
       							New Ticket
