@@ -15,7 +15,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 		var deps []Department
 		for i := 0; i < len(d.Departments); i++ {
 			if d.Departments[i].IsBuildingSpecific {
-				if d.Departments[i].Building.Hex() == u.Building.Hex() {
+				if (d.Departments[i].Building.Hex() == u.Building.Hex()) || u.Roles.DomainAdmin {
 					deps = append(deps, d.Departments[i])
 				}
 			} else {
