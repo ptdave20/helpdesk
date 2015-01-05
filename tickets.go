@@ -11,6 +11,20 @@ import (
 )
 
 func InitTicketService(m *martini.ClassicMartini) {
+	m.Get("/o/my_departments", RequireLogin(), func(u User, d Domain, db *mgo.Database, p martini.Params) string {
+		var deps []Department
+		for i := 0; i < len(d.Departments); i++ {
+			if d.Departments[i].IsBuildingSpecific {
+				if d.Departments[i].Building.Hex() == u.Building.Hex() {
+					deps = append(deps, d.Departments[i])
+				}
+			} else {
+				deps = append(deps, d.Departments[i])
+			}
+		}
+		b, _ := json.Marshal(deps)
+		return string(b)
+	})
 	m.Group("/o/ticket", func(r martini.Router) {
 		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			return ""
@@ -61,6 +75,10 @@ func InitTicketService(m *martini.ClassicMartini) {
 			var denied SimpleResult
 			denied.Result = false
 			c := db.C(TicketsC)
+			bId := bson.ObjectIdHex(p["id"])
+			if !bId.Valid() {
+				return "invalid"
+			}
 			err := c.Find(bson.M{"_id": bson.ObjectIdHex(p["id"])}).One(&ticket)
 			if err != nil {
 				print(err.Error())

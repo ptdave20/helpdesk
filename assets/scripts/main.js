@@ -108,7 +108,7 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		$scope.user = data;
 		if($scope.user.NewUser) {
 			var modalInstance = $modal.open({
-				templateUrl: '/templates/new_user.html',
+				templateUrl: '/templates/nmodal_user.html',
 				controller: 'userModal',
 				backdrop: 'static',
 				resolve: {
@@ -117,6 +117,17 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 			})
 		}
 	});
+
+	$scope.myAccount = function() {
+		var modalInstance = $modal.open({
+			templateUrl: '/templates/modal_user.html',
+			controller: 'userModal',
+			backdrop: 'static',
+			resolve: {
+				
+			}
+		});
+	}
 
 	$scope.openTicket = function(ticketId) {
 		var modalInstance = $modal.open({
