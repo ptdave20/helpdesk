@@ -24,24 +24,51 @@
 		
       	<div class="collapse navbar-collapse" collapse="isCollapsed">
       		<ul class="nav navbar-nav">
-      			<li ng-class="{active:isActive('/')}" ng-click="isCollapsed = true"><a href="#">Home</a></li>
+      			<li ng-class="{active:isActive('/')}" ng-click="isCollapsed = true">
+      				<a href="#">
+      					<span class="glyphicon glyphicon-home hidden-xs" aria-hidden="true"></span> <span class="visible-xs">Home</span>
+      				</a>
+      			</li>
       			<li ng-class="{active:isActive('/tickets')}" dropdown is-open="options.ticketMenuOpen">
-      				<a href="#" class="dropdown-toggle" data-toggle="dropdown" dropdown-toggle role="button" aria-expanded="false">Tickets <span class="caret"></span></a>
+      				<a href="#" class="dropdown-toggle" data-toggle="dropdown" dropdown-toggle role="button" aria-expanded="false">
+      					<span class="glyphicon glyphicon-tags hidden-xs" aria-hidden="true"></span> <span class="visible-xs">Tickets</span> <span class="caret"></span>
+      				</a>
       				<ul class="dropdown-menu" role="menu">
-      					<li><a href="#/tickets/mine" ng-click="isCollapsed = true">Mine</a></li>
-      					<li ng-show="user.department.length" ng-click="isCollapsed = true"><a href="#/tickets/department">Departments</a></li>
-      					<li ng-show="hasAssigned"><a href="#/tickets/assigned" ng-click="isCollapsed = true">Assigned</a></li>
+      					<li>
+      						<a href="#/tickets/mine" ng-click="isCollapsed = true">
+      							Mine
+      						</a>
+      					</li>
+      					<li ng-show="user.Department.length || user.Roles.DomainAdmin" ng-click="isCollapsed = true">
+      						<a href="#/tickets/department">
+      							Departments
+      						</a>
+      					</li>
+      					<li ng-show="hasAssigned">
+      						<a href="#/tickets/assigned" ng-click="isCollapsed = true">
+      							Assigned
+      						</a>
+      					</li>
+      					<li>
+      						<a ng-click="newTicket()" ng-click="isCollapsed = true">
+      							New Ticket
+      						</a>
+      					</li>
       				</ul>
       			</li>
       			<li>
-      				<a ng-click="newTicket()" ng-click="isCollapsed = true"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Ticket</a>
+  					<a ng-click="myAccount()">
+  						<span class="glyphicon glyphicon-user hidden-xs" aria-hidden="true"></span> <span class="visible-xs">Account</span>
+  					</a>
       			</li>
-      			<li>
-  					<a ng-click="myAccount()">Account</a>
+      			<li ng-show="user.Roles.DomainAdmin" class="hidden-xs">
+  					<a href="admin.html" ng-click="isCollapsed = true">
+  						<span class="glyphicon glyphicon-wrench hidden-xs"  aria-hidden="true"></span> <span class="visible-xs">Admin</span>
+  					</a>
       			</li>
       			<li>
       				<a href="/o/logout" ng-click="isCollapsed = true">
-      					<span class="glyphicon glyphicon-off" aria-hidden="true"></span> Sign out
+      					<span class="glyphicon glyphicon-off hidden-xs" aria-hidden="true"></span> <span class="visible-xs">Sign out</span>
   					</a>
   				</li>
       		</ul>

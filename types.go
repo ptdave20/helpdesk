@@ -202,6 +202,20 @@ type (
 		Picture       string `json:"picture,omitempty"`
 		Hd            string `json:"hd,omitempty"`
 	}
+	MassMessage struct {
+		Id      string        `bson:"_id"`
+		Domain  bson.ObjectId `bson:"domain"`
+		Expired bool          `bson:"expired"`
+		Message string        `bson:"message"`
+		From    bson.ObjectId `bson:"from"`
+	}
+	News struct {
+		Id      string        `bson:"_id"`
+		Domain  bson.ObjectId `bson:"domain"`
+		Show    bool          `bson:"show"`
+		From    bson.ObjectId `bson:"from"`
+		Message string        `bson:"message"`
+	}
 )
 
 func (t Ticket) Marshal() string {
