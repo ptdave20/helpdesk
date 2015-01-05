@@ -1,0 +1,70 @@
+<div>
+	<div class="modal-header">
+		<h3>Helpdesk Ticket</h3>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-3 col-xs-4">Subject</div>
+			<div class="col-md-8 col-xs-8">
+				<div class="well well-sm" ng-hide="options.canEdit">
+					{{ticket.Subject}}
+				</div>
+				<input type="text" class="form-control" ng-model="ticket.Subject" ng-show="options.canEdit">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 col-xs-4">Department</div>
+			<div class="col-md-8 col-xs-8">
+				<div class="well well-sm" ng-hide="options.canEdit">
+					{{departmentName}}
+				</div>
+				<select class="form-control" ng-model="ticket.Department" ng-show="options.canEdit" ng-change="DepCatChange()">
+					<option ng-repeat="d in departments" value="{{d.Id}}">
+						{{d.Name}}
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 col-xs-4">Category</div>
+			<div class="col-md-8 col-xs-8">
+				<div class="well well-sm"  ng-hide="options.canEdit">
+					{{categoryName}}
+				</div>
+				<select class="form-control" ng-show="options.canEdit">
+					<option ng-repeat="cat in categories" value="{{cat.Id}}">
+						{{cat.Name}}
+					</option>
+				</select>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-md-3 col-xs-4">Description</div>
+			<div class="col-md-8 col-xs-8">
+				<div class="well well-sm" ng-hide="options.canEdit">
+					{{ticket.Description}}
+				</div>
+				<textarea class="form-control" ng-show="options.canEdit" ng-model="ticket.Description"></textarea>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-md-3 col-xs-4">Notes</div>
+			<div class="col-md-8 col-xs-8">
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-md-3 col-xs-4">Documents</div>
+			<div class="col-md-8 col-xs-8">
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-hide="options.newTicket" ng-click="update()">Update</button>
+		<button class="btn btn-primary" ng-show="options.newTicket" ng-click="submit()">Submit</button>
+		<button class="btn btn-success" ng-show="options.canClose" ng-click="close()">Close</button>
+		<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+	</div>
+</div>
