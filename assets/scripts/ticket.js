@@ -10,7 +10,10 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 	$scope.options = options;
 
 	DepartmentsService.getDepartments().then(function(data) { $scope.departments = data.data; });
-	TicketService.Get($scope.options.ticketId).then(function(data) { $scope.ticket = data.data; });
+	if($scope.options.ticketId != null) {
+		TicketService.Get($scope.options.ticketId).then(function(data) { $scope.ticket = data.data; });	
+	}
+	
 	$scope.DepCatChange = function() {
 		for(var d=0; d<$scope.departments.length; d++) {
 			if($scope.departments[d].Id == $scope.ticket.Department) {
@@ -40,7 +43,7 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 		if(!$scope.options.newTicket)
 			return;
 		$http.post(
-			'/o/ticket/insert',
+			'/o/ticket',
 			$scope.ticket,
 			{
 				withCredentials:true,

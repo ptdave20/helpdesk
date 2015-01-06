@@ -1,0 +1,29 @@
+<!-- Main column -->
+<div class="col-md-10 col-xs-10">
+	<!-- NEWS / MASS MESSAGE -->
+	<div class="well" ng-repeat="msg in messages">
+
+	</div>
+	<!-- USERS TICKETS -->
+	<table class="table">
+		<thead>
+			<td>Name</td>
+			<td>Submission Date</td>
+			<td>Status</td>
+		</thead>
+		<tr ng-repeat="tkt in mytickets">
+			<td>{{tkt.Subject}}</td>
+			<td>{{tkt.Created | date:'short'}}</td>
+			<td>
+				<span class="label label-warning" ng-show="tkt.Status=='open'">Open</span>
+				<span class="label label-success" ng-show="tkt.Status=='closed'">Closed</span>
+				<span class="label label-danger" ng-show="tkt.Status=='needsuserresponse'">Needs Response <span class="glyphicon glyphicon-exclamation-sign"></span></span>
+				<span class="label label-default" ng-show="tkt.Status=='waiting'">Waiting</span>
+			</td>
+		</tr>
+	</table>
+</div>
+<!-- Side column -->
+<div class="col-md-2 col-xs-2">
+	<button role="button" class="btn btn-success" ng-click="newTicket()">New Ticket</button>
+</div>

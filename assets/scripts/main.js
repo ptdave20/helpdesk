@@ -66,7 +66,10 @@ helpdesk.service('MyAssigned', function($http) {
 helpdesk.service('TicketService', ['$http',function($http) {
 	function TicketService() {
 		this.Get = function(id) {
-			console.log(id);
+			if(id==null) {
+				console.log("invalid id");
+				return;
+			}
 			return $http.get('/o/ticket/'+id,{withCredentials:true});
 		}
 		this.Update = function(ticket) {
@@ -470,3 +473,8 @@ helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope
 	$scope.tickets = $scope.$parent.mine;
 }]);
 
+helpdesk.controller('homeCtrl', ['$scope', '$http','TicketService', function($scope,$http,TicketService) {
+	$http.get('/o/tickets/submitted/all/10',{withCredentials:true}).success(function(data) {
+		$scope.mytickets = data;
+	});
+}]);

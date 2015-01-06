@@ -2,7 +2,8 @@ helpdesk
 .config(function($routeProvider) {
 	$routeProvider
 	.when('/', {
-		template: '<h1>Welcome to the Helpdesk</h1>'
+		templateUrl: '/templates/home.html',
+		controller: 'homeCtrl'
 	})
 	.when('/tickets/mine', {
 		templateUrl: '/templates/ticketlist.html',

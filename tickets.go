@@ -100,7 +100,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 			return ""
 		})
 		// If a ticket is sent to us on the root of /o/ticket using POST, they are trying to add a ticket
-		r.Post("/", RequireLogin(), func(domain Domain, u User, db *mgo.Database, req *http.Request) string {
+		r.Post("", RequireLogin(), func(domain Domain, u User, db *mgo.Database, req *http.Request) string {
 			d := json.NewDecoder(req.Body)
 
 			var tkt Ticket
@@ -176,6 +176,34 @@ func InitTicketService(m *martini.ClassicMartini) {
 			c := db.C(TicketsC)
 			count, _ := c.Find(bson.M{"submitter": u.Id, "status": bson.M{"$ne": "closed"}}).Count()
 			return strconv.Itoa(count)
+		})
+		r.Get("/assigned/:status/:count", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			c := db.C(TicketsC)
+			var tickets []Ticket
+			var count int
+			count, _ = strconv.Atoi(p["count"])
+			switch p["status"] {
+			case "all":
+				c.Find(bson.M{
+					"assigned_to": u.Id}).Limit(count).All(&tickets)
+				break
+			case "open":
+				c.Find(bson.M{
+					"assigned_to": u.Id,
+					"status":      bson.M{"$ne": "closed"}}).Limit(count).All(&tickets)
+				break
+			default:
+				c.Find(bson.M{
+					"assigned_to": u.Id,
+					"status":      p["status"]}).Limit(count).All(&tickets)
+				break
+			}
+
+			c.Find(bson.M{"assigned_to": u.Id}).All(&tickets)
+
+			b, _ := json.Marshal(tickets)
+
+			return string(b)
 		})
 		r.Get("/assigned/:status", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			c := db.C(TicketsC)
@@ -266,6 +294,32 @@ func InitTicketService(m *martini.ClassicMartini) {
 					"status":    p["status"]}).All(&tickets)
 				break
 			}
+			b, _ := json.Marshal(tickets)
+
+			return string(b)
+		})
+		r.Get("/submitted/:status/:count", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
+			c := db.C(TicketsC)
+			var tickets []Ticket
+			var count int
+			count, _ = strconv.Atoi(p["count"])
+			switch p["status"] {
+			case "all":
+				c.Find(bson.M{
+					"submitter": u.Id}).Limit(count).All(&tickets)
+				break
+			case "open":
+				c.Find(bson.M{
+					"submitter": u.Id,
+					"status":    bson.M{"$ne": "closed"}}).Limit(count).All(&tickets)
+				break
+			default:
+				c.Find(bson.M{
+					"submitter": u.Id,
+					"status":    p["status"]}).Limit(count).All(&tickets)
+				break
+			}
+
 			b, _ := json.Marshal(tickets)
 
 			return string(b)
