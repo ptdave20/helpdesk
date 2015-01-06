@@ -1,5 +1,17 @@
 var helpdesk = angular.module('helpIndex',['ngRoute','ui.bootstrap.tpls', 'ui.bootstrap.modal','ui.bootstrap']);
 
+helpdesk.service('UserService', function($http) {
+	function UserService() {
+		this.me = null;
+		this.getMe = function() {
+			return $http.get('/o/user/me');
+		}
+		this.getUser = function(id) {
+			return $http.get('/o/user/id');
+		}
+	}
+	return new UserService();
+});
 
 helpdesk.service('DepartmentsService', function($http) {
 	function DeptListService() {
@@ -73,7 +85,7 @@ helpdesk.service('TicketService', ['$http',function($http) {
 			return $http.get('/o/ticket/'+id,{withCredentials:true});
 		}
 		this.Update = function(ticket) {
-			console.log(ticket);
+			return $http.post('/o/ticket/'+ticket.Id, ticket, {withCredentials:true});
 		}
 		this.Close = function(ticket) {
 			console.log(ticket);
@@ -120,6 +132,10 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 			})
 		}
 	});
+
+	$scope.getUser = function() {
+		return $scope.user;
+	}
 
 	$scope.myAccount = function() {
 		var modalInstance = $modal.open({
@@ -473,8 +489,16 @@ helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope
 	$scope.tickets = $scope.$parent.mine;
 }]);
 
-helpdesk.controller('homeCtrl', ['$scope', '$http','TicketService', function($scope,$http,TicketService) {
-	$http.get('/o/tickets/submitted/all/10',{withCredentials:true}).success(function(data) {
-		$scope.mytickets = data;
+helpdesk.controller('homeCtrl', ['$scope', '$http', '$interval', 'TicketService', function($scope,$http,$interval,TicketService) {
+	$scope.getSubmissions = function() {
+		$http.get('/o/tickets/submitted/all',{withCredentials:true}).success(function(data) {
+			$scope.mytickets = data;
+		});
+	}
+	$scope.bg = $interval($scope.getSubmissions, 10000,0,true);
+	$scope.getSubmissions();
+
+	$scope.$on('$routeChangeStart', function() {
+		$interval.cancel($scope.bg);
 	});
 }]);

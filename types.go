@@ -102,9 +102,9 @@ type (
 		Building           bson.ObjectId `json:"Building"`
 	}
 	Document struct {
-		Id        bson.ObjectId `bson:"_id"`
+		Id        bson.ObjectId `bson:"_id,omitempty"`
 		Created   time.Time     `bson:"created"`
-		Submitter bson.ObjectId `bson:"submitter"`
+		Submitter bson.ObjectId `bson:"submitter,omitempty"`
 		Name      string        `bson:"name"`
 		Data      []byte        `bson:"data"`
 		Mime      string        `bson:"mime"`
@@ -113,25 +113,32 @@ type (
 		Value string `bson:"value"`
 		Name  string `bson:"name"`
 	}
+	TicketMessage struct {
+		From    bson.ObjectId `bson:"from,omitempty",json:"omitempty"`
+		When    time.Time     `bson:"when",json:"omitempty"`
+		Message string        `bson:"message"`
+	}
 	Ticket struct {
-		Id          bson.ObjectId `bson:"_id"`
-		Domain      bson.ObjectId `bson:"domain-id"`
-		Submitter   bson.ObjectId `bson:"submitter,omitempty"`
-		AssignedTo  bson.ObjectId `bson:"assigned_to,omitempty"`
-		AttachedTo  bson.ObjectId `bson:"attached_to,omitempty"`
-		Building    bson.ObjectId `bson:"building,omitempty"`
-		Department  bson.ObjectId `bson:"department,omitempty"`
-		Category    bson.ObjectId `bson:"category,omitempty"`
-		Target      bson.ObjectId `bson:"target,omitempty"`
-		Subject     string        `bson:"subject"`
-		Created     time.Time     `bson:"created"`
-		Closed      time.Time     `bson:"closed"`
-		Status      string        `bson:"status,omitempty"`
-		Duration    time.Duration `bson:"duration"`
-		Notes       []Note        `bson:"notes"`
-		Documents   []Document    `bson:"document"`
-		Description string        `bson:"description,omitempty"`
-		Solution    string        `bson:"solution,omitempty"`
+		Id          bson.ObjectId   `bson:"_id,omitempty",json:"omitempty"`
+		Domain      bson.ObjectId   `bson:"domain-id",json:"omitempty"`
+		Submitter   bson.ObjectId   `bson:"submitter,omitempty",json:"omitempty"`
+		AssignedTo  bson.ObjectId   `bson:"assigned_to,omitempty",json:"omitempty"`
+		AttachedTo  bson.ObjectId   `bson:"attached_to,omitempty",json:"omitempty"`
+		Building    bson.ObjectId   `bson:"building,omitempty",json:"omitempty"`
+		Department  bson.ObjectId   `bson:"department,omitempty",json:"omitempty"`
+		Category    bson.ObjectId   `bson:"category,omitempty",json:"omitempty"`
+		Target      bson.ObjectId   `bson:"target,omitempty",json:"omitempty"`
+		Subject     string          `bson:"subject,omitempty",json:"omitempty"`
+		Created     time.Time       `bson:"created,omitempty",json:"omitempty"`
+		Closed      time.Time       `bson:"closed,omitempty",json:"omitempty"`
+		Updated     time.Time       `bson:"updated,omitempty",json:"omitempty"`
+		Status      string          `bson:"status,omitempty",json:"omitempty"`
+		Duration    time.Duration   `bson:"duration,omitempty",json:"omitempty"`
+		Notes       []Note          `bson:"notes,omitempty",json:"omitempty"`
+		Documents   []Document      `bson:"documents,omitempty",json:"omitempty"`
+		Description string          `bson:"description,omitempty",json:"omitempty"`
+		Solution    string          `bson:"solution,omitempty",json:"omitempty"`
+		Messages    []TicketMessage `bson:"messages,omitempty",json:"omitempty"`
 	}
 	TicketUpdate struct {
 		AssignedTo  bson.ObjectId `json:"assigned_to,omitempty"`
@@ -320,6 +327,38 @@ func (u User) CanEditTicket(ticket Ticket) bool {
 		return true
 	}
 
+	return false
+}
+func (u User) CanAddNote(ticket Ticket) bool {
+	if ticket.AssignedTo.Hex() == u.Id.Hex() {
+		return true
+	}
+	if ticket.Submitter.Hex() == u.Id.Hex() {
+		return true
+	}
+	return u.InDepartment(ticket.Department)
+}
+func (u User) CanAddMessage(ticket Ticket) bool {
+	if ticket.AssignedTo.Hex() == u.Id.Hex() {
+		return true
+	}
+	if ticket.Submitter.Hex() == u.Id.Hex() {
+		return true
+	}
+	if u.Roles.DomainAdmin {
+		return true
+	}
+	return u.InDepartment(ticket.Department)
+}
+func (u User) CanAssign(dep Department, ticket Ticket) bool {
+	if u.Roles.DomainAdmin {
+		return true
+	}
+	for i := 0; i < len(dep.Users); i++ {
+		if dep.Users[i].UserId.Hex() == u.Id.Hex() && dep.Users[i].DepAssignTicket {
+			return true
+		}
+	}
 	return false
 }
 func (u User) CanDelete(ticket Ticket) bool {

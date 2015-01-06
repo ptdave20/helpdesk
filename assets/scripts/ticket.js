@@ -3,16 +3,29 @@ angular.module('helpIndex').controller('ticketViewCtrl', ['$scope','$http','$rou
 	TicketService.Get($routeParams.id).then(function(data) { $scope.ticket = data.data; });
 }]);
 
-angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalInstance','TicketService', 'DepartmentsService', 'options', function($scope,$http,$modalInstance,TicketService,DepartmentsService,options) {
+angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalInstance','TicketService', 'DepartmentsService', 'UserService', 'options', function($scope,$http,$modalInstance,TicketService,DepartmentsService,UserService, options) {
 	$scope.ticket = {};
 	$scope.departments = []
 	$scope.categories = [];
 	$scope.options = options;
 
-	DepartmentsService.getDepartments().then(function(data) { $scope.departments = data.data; });
-	if($scope.options.ticketId != null) {
-		TicketService.Get($scope.options.ticketId).then(function(data) { $scope.ticket = data.data; });	
-	}
+	UserService.getMe().success(function(me) {
+		$scope.me = me;
+	}).then(function() {
+		TicketService.Get($scope.options.ticketId).success(function(ticket) {
+			$scope.ticket = ticket;
+		}).then(function() {
+			if( $scope.ticket.Submitter == $scope.me.Id || 
+				$scope.ticket.AssignedTo == $scope.me.Id || 
+				$scope.ticket.Department.con) {
+				$scope.options.canEdit = true;
+			}
+		});
+	})
+
+	DepartmentsService.getDepartments().success(function(deptartments) {
+		$scope.departments = deptartments;
+	});
 	
 	$scope.DepCatChange = function() {
 		for(var d=0; d<$scope.departments.length; d++) {
@@ -36,7 +49,7 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 	}
 
 	$scope.update = function() {
-
+		TicketService.Update($scope.ticket);
 	}
 
 	$scope.submit = function() {

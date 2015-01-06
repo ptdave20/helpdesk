@@ -94,10 +94,50 @@ func InitTicketService(m *martini.ClassicMartini) {
 			return denied.Marshal()
 		})
 		// If we post to a ticket id, we are trying to update
-		r.Post("/:id", RequireLogin(), func(u User, db *mgo.Database, req *http.Request) string {
-			//d := json.NewDecoder(req.Body)
-			//var ticket Ticket
-			return ""
+		r.Post("/:id", RequireLogin(), func(u User, db *mgo.Database, req *http.Request, p martini.Params) string {
+			c := db.C(TicketsC)
+			var original Ticket
+			id := bson.ObjectIdHex(p["id"])
+			if !id.Valid() {
+				return "invalid"
+			}
+
+			c.Find(bson.M{"_id": id}).One(&original)
+
+			if !u.CanEditTicket(original) {
+				return "denied"
+			}
+
+			d := json.NewDecoder(req.Body)
+			var ticket Ticket
+			err := d.Decode(&ticket)
+			if err != nil {
+				panic(err)
+			}
+
+			var changes = false
+
+			// Editing assumes description, subject, department and category
+			if u.CanEditTicket(original) {
+				original.Department = ticket.Department
+				original.Category = ticket.Category
+				original.Subject = ticket.Subject
+				original.Description = ticket.Description
+				changes = true
+			}
+
+			if changes {
+				// Set a new update time
+				original.Updated = time.Now()
+
+				err = c.Update(bson.M{"_id": original.Id}, original)
+				if err != nil {
+					panic(err)
+
+				}
+				return "success"
+			}
+			return "no changes made"
 		})
 		// If a ticket is sent to us on the root of /o/ticket using POST, they are trying to add a ticket
 		r.Post("", RequireLogin(), func(domain Domain, u User, db *mgo.Database, req *http.Request) string {
@@ -115,7 +155,6 @@ func InitTicketService(m *martini.ClassicMartini) {
 			tkt.Status = "open"
 			tkt.Building = u.Building
 			tkt.Domain = domain.Id
-
 			tkt.Created = time.Now()
 
 			c := db.C(TicketsC)
@@ -123,14 +162,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 			if err != nil {
 				panic(err)
 			}
-
-			// Move it to json
-			out, err := json.Marshal(&tkt)
-
-			if err != nil {
-				panic(err)
-			}
-			return string(out)
+			return "success"
 		})
 	})
 	// This is strictly for retrieving tickets from the database

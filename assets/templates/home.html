@@ -5,13 +5,13 @@
 
 	</div>
 	<!-- USERS TICKETS -->
-	<table class="table">
+	<table class="table table-hover">
 		<thead>
 			<td>Name</td>
 			<td>Submission Date</td>
 			<td>Status</td>
 		</thead>
-		<tr ng-repeat="tkt in mytickets">
+		<tr ng-repeat="tkt in mytickets" ng-click="openTicket(tkt.Id);">
 			<td>{{tkt.Subject}}</td>
 			<td>{{tkt.Created | date:'short'}}</td>
 			<td>
