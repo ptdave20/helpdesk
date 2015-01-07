@@ -18,7 +18,7 @@
 				<div class="well well-sm" ng-hide="options.canEdit">
 					{{departmentName}}
 				</div>
-				<select class="form-control" ng-model="ticket.Department" ng-show="options.canEdit" ng-change="DepCatChange()">
+				<select class="form-control" ng-model="ticket.Department" ng-show="options.canEdit">
 					<option ng-repeat="d in departments" value="{{d.Id}}">
 						{{d.Name}}
 					</option>
@@ -31,9 +31,9 @@
 				<div class="well well-sm"  ng-hide="options.canEdit">
 					{{categoryName}}
 				</div>
-				<select class="form-control" ng-model="ticket.Category" ng-show="options.canEdit">
-					<option value=""></option>
-					<option ng-repeat="cat in departments | category:ticket.Department" value="{{cat.Id}}">
+				<select class="form-control" ng-model="ticket.Category" ng-show="options.canEdit" value="{{ticket.Category}}">
+					<option></option>
+					<option ng-repeat="cat in department().Category" value="{{cat.Id}}" ng-selected="{{cat.Id == ticket.Category}}">
 						{{cat.Name}}
 					</option>
 				</select>

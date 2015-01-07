@@ -34,7 +34,7 @@ admin.controller('depCtrl', function($scope,$http) {
 		var cat_data = {
 			Name : cat
 		};
-		$http.post('/o/department/'+depId,cat_data,{withCredentials:true}).success(function(data) {
+		$http.post('/o/department/'+depId+'/category',cat_data,{withCredentials:true}).success(function(data) {
 			$scope.getDepartments();
 		});
 	}

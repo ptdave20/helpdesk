@@ -110,13 +110,13 @@ helpdesk.service('TicketService', ['$http',function($http) {
 	return new TicketService();
 }]);
 
-angular.module('helpIndex',[]).filter('categories', function() {
+helpdesk.filter('categories', function() {
 	return function(input,id) {
 		for(var i=0; i<input.length; i++) {
-			if(input.Id == id)
-				return input.Category;
+			if(input[i].Id == id)
+				return input[i].Category;
 		}
-		return []
+		return [];
 	}
 });
 

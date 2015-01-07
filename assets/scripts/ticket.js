@@ -26,6 +26,15 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 	DepartmentsService.getDepartments().success(function(deptartments) {
 		$scope.departments = deptartments;
 	});
+
+	$scope.department = function() {
+		for(var i=0; i<$scope.departments.length; i++) {
+			if($scope.departments[i].Id == $scope.ticket.Department) {
+				return $scope.departments[i];
+			}
+		}
+		return {Category:[]};
+	}
 	
 	$scope.DepCatChange = function() {
 		for(var d=0; d<$scope.departments.length; d++) {
@@ -73,6 +82,6 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 	$scope.cancel = function() {
 		$modalInstance.dismiss();
 	}
-	$scope.DepCatChange();
+	//$scope.DepCatChange();
 	
 }]);
