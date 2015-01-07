@@ -85,7 +85,13 @@ helpdesk.service('TicketService', ['$http',function($http) {
 			return $http.get('/o/ticket/'+id,{withCredentials:true});
 		}
 		this.Update = function(ticket) {
-			return $http.post('/o/ticket/'+ticket.Id, ticket, {withCredentials:true});
+
+			return $http.post('/o/ticket/'+ticket.Id, {
+				Department : ticket.Department,
+				Category : ticket.Category,
+				Description : ticket.Description,
+				Subject: ticket.Subject
+			}, {withCredentials:true});
 		}
 		this.Close = function(ticket) {
 			console.log(ticket);

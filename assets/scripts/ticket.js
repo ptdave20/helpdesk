@@ -49,7 +49,9 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 	}
 
 	$scope.update = function() {
-		TicketService.Update($scope.ticket);
+		TicketService.Update($scope.ticket).success(function(data) {
+			$modalInstance.close(true);
+		});
 	}
 
 	$scope.submit = function() {
@@ -65,11 +67,7 @@ angular.module('helpIndex').controller('ticketModal', ['$scope','$http','$modalI
 				}
 			}
 		).success(function(data) {
-			j = angular.fromJson(data);
-
-			if(j["Id"]!=null || j["Id"]!=undefined) {
-				$modalInstance.close(true);	
-			}
+			$modalInstance.close(true);
 		});
 	}
 	$scope.cancel = function() {

@@ -26,9 +26,6 @@ func InitTicketService(m *martini.ClassicMartini) {
 		return string(b)
 	})
 	m.Group("/o/ticket", func(r martini.Router) {
-		r.Post("/update/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
-			return ""
-		})
 		r.Post("/close/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			var id string = p["id"]
 			var tkt Ticket
@@ -109,7 +106,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 			}
 
 			d := json.NewDecoder(req.Body)
-			var ticket Ticket
+			var ticket TicketUpdate
 			err := d.Decode(&ticket)
 			if err != nil {
 				panic(err)
@@ -123,6 +120,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 				original.Category = ticket.Category
 				original.Subject = ticket.Subject
 				original.Description = ticket.Description
+				original.Domain = u.Domain
 				changes = true
 			}
 
@@ -130,7 +128,7 @@ func InitTicketService(m *martini.ClassicMartini) {
 				// Set a new update time
 				original.Updated = time.Now()
 
-				err = c.Update(bson.M{"_id": original.Id}, original)
+				err = c.Update(bson.M{"_id": id}, original)
 				if err != nil {
 					panic(err)
 

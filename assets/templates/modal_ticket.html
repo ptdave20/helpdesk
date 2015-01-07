@@ -31,7 +31,8 @@
 				<div class="well well-sm"  ng-hide="options.canEdit">
 					{{categoryName}}
 				</div>
-				<select class="form-control" ng-show="options.canEdit">
+				<select class="form-control" ng-model="ticket.Category" ng-show="options.canEdit">
+					<option value=""></option>
 					<option ng-repeat="cat in categories" value="{{cat.Id}}">
 						{{cat.Name}}
 					</option>

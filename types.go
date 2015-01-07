@@ -119,34 +119,32 @@ type (
 		Message string        `bson:"message"`
 	}
 	Ticket struct {
-		Id          bson.ObjectId   `bson:"_id,omitempty",json:"omitempty"`
-		Domain      bson.ObjectId   `bson:"domain-id",json:"omitempty"`
-		Submitter   bson.ObjectId   `bson:"submitter,omitempty",json:"omitempty"`
-		AssignedTo  bson.ObjectId   `bson:"assigned_to,omitempty",json:"omitempty"`
-		AttachedTo  bson.ObjectId   `bson:"attached_to,omitempty",json:"omitempty"`
-		Building    bson.ObjectId   `bson:"building,omitempty",json:"omitempty"`
-		Department  bson.ObjectId   `bson:"department,omitempty",json:"omitempty"`
-		Category    bson.ObjectId   `bson:"category,omitempty",json:"omitempty"`
-		Target      bson.ObjectId   `bson:"target,omitempty",json:"omitempty"`
-		Subject     string          `bson:"subject,omitempty",json:"omitempty"`
-		Created     time.Time       `bson:"created,omitempty",json:"omitempty"`
-		Closed      time.Time       `bson:"closed,omitempty",json:"omitempty"`
-		Updated     time.Time       `bson:"updated,omitempty",json:"omitempty"`
-		Status      string          `bson:"status,omitempty",json:"omitempty"`
-		Duration    time.Duration   `bson:"duration,omitempty",json:"omitempty"`
-		Notes       []Note          `bson:"notes,omitempty",json:"omitempty"`
-		Documents   []Document      `bson:"documents,omitempty",json:"omitempty"`
-		Description string          `bson:"description,omitempty",json:"omitempty"`
-		Solution    string          `bson:"solution,omitempty",json:"omitempty"`
-		Messages    []TicketMessage `bson:"messages,omitempty",json:"omitempty"`
+		Id          bson.ObjectId   `bson:"_id,omitempty"`
+		Domain      bson.ObjectId   `bson:"domain_id"`
+		Submitter   bson.ObjectId   `bson:"submitter,omitempty"`
+		AssignedTo  bson.ObjectId   `bson:"assigned_to,omitempty"`
+		AttachedTo  bson.ObjectId   `bson:"attached_to,omitempty"`
+		Building    bson.ObjectId   `bson:"building,omitempty"`
+		Department  bson.ObjectId   `bson:"department,omitempty"`
+		Category    bson.ObjectId   `bson:"category,omitempty"`
+		Target      bson.ObjectId   `bson:"target,omitempty"`
+		Subject     string          `bson:"subject,omitempty"`
+		Created     time.Time       `bson:"created,omitempty"`
+		Closed      time.Time       `bson:"closed,omitempty"`
+		Updated     time.Time       `bson:"updated,omitempty"`
+		Status      string          `bson:"status,omitempty"`
+		Duration    time.Duration   `bson:"duration,omitempty"`
+		Notes       []Note          `bson:"notes,omitempty"`
+		Documents   []Document      `bson:"documents,omitempty"`
+		Description string          `bson:"description,omitempty"`
+		Solution    string          `bson:"solution,omitempty"`
+		Messages    []TicketMessage `bson:"messages,omitempty"`
 	}
 	TicketUpdate struct {
-		AssignedTo  bson.ObjectId `json:"assigned_to,omitempty"`
-		Department  bson.ObjectId `json:"department,omitempty"`
-		Category    bson.ObjectId `json:"category,omitempty"`
-		Status      string        `json:"status,omitempty"`
-		Notes       []Note        `json:"notes"`
-		Description string        `json:"description,omitempty"`
+		Department  bson.ObjectId `json:"Department,omitempty"`
+		Category    bson.ObjectId `json:"Category,omitempty"`
+		Description string        `json:"Description,omitempty"`
+		Subject     string        `json:"Subject,omitempty"`
 	}
 	TicketCount struct {
 		Day        int `bson:"day"`
