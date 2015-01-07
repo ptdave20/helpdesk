@@ -110,6 +110,16 @@ helpdesk.service('TicketService', ['$http',function($http) {
 	return new TicketService();
 }]);
 
+angular.module('helpIndex',[]).filter('categories', function() {
+	return function(input,id) {
+		for(var i=0; i<input.length; i++) {
+			if(input.Id == id)
+				return input.Category;
+		}
+		return []
+	}
+});
+
 angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$interval,$location,MyAssigned) {
 	$scope.isCollapsed = true;
 
@@ -173,10 +183,7 @@ angular.module('helpIndex').controller('bCtrl', function ($scope,$http,$modal,$i
 		});
 
 		modalInstance.result.then(function(data) {
-			if(data) {
-				$scope.Tickets.departments.getTickets();
-				$scope.Tickets.mine.getTickets();
-			}
+			
 		});
 	}
 

@@ -137,6 +137,9 @@ func InitTicketService(m *martini.ClassicMartini) {
 			}
 			return "no changes made"
 		})
+		r.Post("/:id/closed", RequireLogin(), func(u User, db *mgo.Database, req *http.Request, p martini.Params) string {
+			return "unimplemented"
+		})
 		// If a ticket is sent to us on the root of /o/ticket using POST, they are trying to add a ticket
 		r.Post("", RequireLogin(), func(domain Domain, u User, db *mgo.Database, req *http.Request) string {
 			d := json.NewDecoder(req.Body)

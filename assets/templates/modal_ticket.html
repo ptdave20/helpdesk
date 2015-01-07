@@ -33,7 +33,7 @@
 				</div>
 				<select class="form-control" ng-model="ticket.Category" ng-show="options.canEdit">
 					<option value=""></option>
-					<option ng-repeat="cat in categories" value="{{cat.Id}}">
+					<option ng-repeat="cat in departments | category:ticket.Department" value="{{cat.Id}}">
 						{{cat.Name}}
 					</option>
 				</select>
