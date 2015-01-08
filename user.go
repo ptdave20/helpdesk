@@ -16,7 +16,6 @@ import (
 
 func UserExists(db *mgo.Database, Id string) (*User, error) {
 	user := new(User)
-
 	col := db.C(UsersC)
 	err := col.Find(bson.M{"google_id": Id}).One(user)
 	if err != nil {
@@ -164,7 +163,7 @@ func Oauth2Handler() martini.Handler {
 				if user == nil {
 					http.Redirect(w, r, "/#/error/invalid_domain", 302)
 				}
-				ses := CreateUserSession(db, *user, client)
+				ses := CreateUserSession(db, *user)
 				s.Set("session", ses)
 				//val, _ := json.Marshal(transport.Token())
 				//s.Set("helpdesk", val)
@@ -212,9 +211,9 @@ func FindOrCreateUser(db *mgo.Database, google_user GoogleUserV2) *User {
 	return user
 }
 
-func CreateUserSession(db *mgo.Database, user User, client *http.Client) string {
+func CreateUserSession(db *mgo.Database, user User) string {
 	col := db.C(SessionsC)
-	var ns = Session{bson.NewObjectId(), user.Id, client}
+	var ns = Session{bson.NewObjectId(), user.Id}
 	ns.Id = bson.NewObjectId()
 
 	col.Insert(ns)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
-	"net/http"
 	"time"
 )
 
@@ -159,7 +158,6 @@ type (
 	Session struct {
 		Id     bson.ObjectId `bson:"_id,omitempty"`
 		UserId bson.ObjectId `bson:"user_id,omitempty"`
-		*http.Client
 	}
 	User struct {
 		Id         bson.ObjectId   `bson:"_id,omitempty",json:"omitempty"`
@@ -364,6 +362,14 @@ func (u User) CanDelete(ticket Ticket) bool {
 }
 func (u User) CanUpdate(ticket Ticket) bool {
 	return false
+}
+func (u User) FindUserById(id string, db *mgo.Database) bool {
+	c := db.C(UsersC)
+	err := c.Find(bson.M{"_id": id}).One(&u)
+	if err != nil {
+		return false
+	}
+	return true
 }
 func (r SimpleResult) Marshal() string {
 	b, _ := json.Marshal(r)
