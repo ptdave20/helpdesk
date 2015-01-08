@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/golang/oauth2"
-	"github.com/golang/oauth2/google"
 	"github.com/martini-contrib/sessions"
 	"io/ioutil"
 	"labix.org/v2/mgo"
@@ -77,18 +76,15 @@ func RequireLogin() martini.Handler {
 				println(err.Error())
 				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
 			}
-			if !ses.Expired() {
-				err = domains.Find(bson.M{"_id": u.Domain}).One(&d)
-				if err != nil {
-					panic(err)
-				}
-				c.Map(u)
-				c.Map(ses)
-				c.Map(d)
-				c.Next()
-			} else {
-				http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
+
+			err = domains.Find(bson.M{"_id": u.Domain}).One(&d)
+			if err != nil {
+				panic(err)
 			}
+			c.Map(u)
+			c.Map(ses)
+			c.Map(d)
+			c.Next()
 
 		} else {
 			http.Redirect(w, r, "/o/login?state="+r.URL.Path, 302)
@@ -113,11 +109,7 @@ func RequireLoginNoRedirectOutResult() martini.Handler {
 				if err != nil {
 					res.Result = false
 				} else {
-					if ses.Expired() {
-						res.Result = false
-					} else {
-						res.Result = true
-					}
+					res.Result = true
 				}
 			}
 		} else {
@@ -129,13 +121,18 @@ func RequireLoginNoRedirectOutResult() martini.Handler {
 }
 
 func Oauth2Handler() martini.Handler {
-
-	cfg, _ := oauth2.New(
-		oauth2.Client(CFG.ClientID, CFG.ClientSecret),
-		oauth2.RedirectURL(CFG.RedirectURI),
-		oauth2.Scope("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"),
-		google.Endpoint(),
-	)
+	cfg := &oauth2.Config{
+		ClientID:     CFG.ClientID,
+		ClientSecret: CFG.ClientSecret,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://accounts.google.com/o/oauth2/auth",
+			TokenURL: "https://accounts.google.com/o/oauth2/token",
+		},
+	}
 
 	return func(db *mgo.Database, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
@@ -145,13 +142,13 @@ func Oauth2Handler() martini.Handler {
 				if state == "" {
 					state = "/"
 				}
-				http.Redirect(w, r, cfg.AuthCodeURL(state, "offline", "force"), 302)
+				http.Redirect(w, r, cfg.AuthCodeURL(state, oauth2.AccessTypeOffline), 302)
 				break
 			case "/o/token":
 				u := r.URL
 				next := u.Query().Get("state")
 				code := u.Query().Get("code")
-				transport, err := cfg.NewTransportFromCode(code)
+				transport, err := cfg.Exchange(oauth2.NoContext, code)
 				if err != nil {
 					print(err.Error())
 					//http.Redirect(w, r, "/o/error", 302)
