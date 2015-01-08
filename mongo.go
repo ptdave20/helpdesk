@@ -3,12 +3,14 @@ package main
 import (
 	"github.com/go-martini/martini"
 	"labix.org/v2/mgo"
+	"log"
 )
 
 func MongoDB() martini.Handler {
 	session, err := mgo.Dial(CFG.MongoAddress)
 	if err != nil {
-		panic(err)
+		println(CFG.MongoAddress)
+		log.Fatal(err)
 	}
 	return func(c martini.Context) {
 		s := session.Clone()

@@ -6,6 +6,8 @@ import (
 	"github.com/martini-contrib/sessions"
 )
 
+var CFG Config
+
 func main() {
 	if !CFG.Load() {
 		if CFG.FirstTimeSetup() {
@@ -13,6 +15,8 @@ func main() {
 		} else {
 			return
 		}
+	} else {
+
 	}
 
 	m := martini.Classic()
