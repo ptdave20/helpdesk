@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/golang/oauth2"
+	"github.com/golang/oauth2/google"
 	"github.com/martini-contrib/sessions"
 	"io/ioutil"
 	"labix.org/v2/mgo"
@@ -121,6 +122,7 @@ func RequireLoginNoRedirectOutResult() martini.Handler {
 }
 
 func Oauth2Handler() martini.Handler {
+
 	cfg := &oauth2.Config{
 		ClientID:     CFG.ClientID,
 		ClientSecret: CFG.ClientSecret,
@@ -128,9 +130,10 @@ func Oauth2Handler() martini.Handler {
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
 		},
+		RedirectURL: CFG.RedirectURI,
 		Endpoint: oauth2.Endpoint{
-			AuthURL:  "https://accounts.google.com/o/oauth2/auth",
-			TokenURL: "https://accounts.google.com/o/oauth2/token",
+			AuthURL:  google.Endpoint.AuthURL,
+			TokenURL: google.Endpoint.TokenURL,
 		},
 	}
 
@@ -148,18 +151,20 @@ func Oauth2Handler() martini.Handler {
 				u := r.URL
 				next := u.Query().Get("state")
 				code := u.Query().Get("code")
-				transport, err := cfg.Exchange(oauth2.NoContext, code)
+				token, err := cfg.Exchange(oauth2.NoContext, code)
 				if err != nil {
 					print(err.Error())
 					//http.Redirect(w, r, "/o/error", 302)
 					return
 				}
-				gUser := GetGoogleUser(transport)
+				client := cfg.Client(oauth2.NoContext, token)
+
+				gUser := GetGoogleUser(client)
 				user := FindOrCreateUser(db, gUser)
 				if user == nil {
 					http.Redirect(w, r, "/#/error/invalid_domain", 302)
 				}
-				ses := CreateUserSession(db, *user, transport.Token())
+				ses := CreateUserSession(db, *user, client)
 				s.Set("session", ses)
 				//val, _ := json.Marshal(transport.Token())
 				//s.Set("helpdesk", val)
@@ -180,8 +185,7 @@ func Oauth2Handler() martini.Handler {
 	}
 }
 
-func GetGoogleUser(transport *oauth2.Transport) GoogleUserV2 {
-	client := http.Client{Transport: transport}
+func GetGoogleUser(client *http.Client) GoogleUserV2 {
 	resp, _ := client.Get("https://www.googleapis.com/userinfo/v2/me")
 	defer resp.Body.Close()
 	g := new(GoogleUserV2)
@@ -208,9 +212,9 @@ func FindOrCreateUser(db *mgo.Database, google_user GoogleUserV2) *User {
 	return user
 }
 
-func CreateUserSession(db *mgo.Database, user User, token *oauth2.Token) string {
+func CreateUserSession(db *mgo.Database, user User, client *http.Client) string {
 	col := db.C(SessionsC)
-	var ns = Session{bson.NewObjectId(), user.Id, *token}
+	var ns = Session{bson.NewObjectId(), user.Id, client}
 	ns.Id = bson.NewObjectId()
 
 	col.Insert(ns)

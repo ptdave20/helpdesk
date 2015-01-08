@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/golang/oauth2"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"net/http"
 	"time"
 )
 
@@ -159,7 +159,7 @@ type (
 	Session struct {
 		Id     bson.ObjectId `bson:"_id,omitempty"`
 		UserId bson.ObjectId `bson:"user_id,omitempty"`
-		oauth2.Token
+		*http.Client
 	}
 	User struct {
 		Id         bson.ObjectId   `bson:"_id,omitempty",json:"omitempty"`
