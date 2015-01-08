@@ -6,13 +6,13 @@ import (
 )
 
 func MongoDB() martini.Handler {
-	session, err := mgo.Dial("mongodb://localhost")
+	session, err := mgo.Dial(CFG.MongoAddress)
 	if err != nil {
 		panic(err)
 	}
 	return func(c martini.Context) {
 		s := session.Clone()
-		c.Map(s.DB("helpdesk"))
+		c.Map(s.DB(CFG.MongoDatabase))
 		defer s.Close()
 		c.Next()
 	}

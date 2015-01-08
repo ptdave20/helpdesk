@@ -10,9 +10,12 @@ import (
 
 type (
 	Config struct {
-		RedirectURI  string `json:"redirect_uri"`
-		ClientID     string `json:"client_id"`
-		ClientSecret string `json:"client_secret"`
+		RedirectURI   string `json:"redirect_uri"`
+		ClientID      string `json:"client_id"`
+		ClientSecret  string `json:"client_secret"`
+		Hostname      string `json:"hostname"`
+		MongoAddress  string `json:"mongo"`
+		MongoDatabase string `json:"mongo_database"`
 	}
 	SimpleResult struct {
 		Result bool `json:"result"`
