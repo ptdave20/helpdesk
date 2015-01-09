@@ -1,0 +1,16 @@
+<table class="table">
+	<thead>
+		<td>Submitter</td>
+		<td>Subject</td>
+		<td>When</td>
+		<td>Last Updated</td>
+		<td>Status</td>
+	</thead>
+	<tr ng-repeat="ticket in tickets">
+		<td>{{ticket.Name}}</td>
+		<td>{{ticket.Subject}}</td>
+		<td>{{ticket.Created | date:'short'}}</td>
+		<td>{{ticket.Updated | date:'short'}}</td>
+		<td>{{ticket.Status}}</td>
+	</td>
+</table>

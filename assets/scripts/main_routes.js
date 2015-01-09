@@ -13,6 +13,10 @@ helpdesk
 		templateUrl: '/templates/ticketList.html',
 		controller: 'depTicketListCtrl'
 	})
+	.when('/tickets/building', {
+		templateUrl: '/templates/tickets_building.html',
+		controller: 'myBuildingTicketsCtrl'
+	})
 	.when('/tickets/assigned', {
 		templateUrl: '/templates/ticketList.html',
 		controller: 'assignedTicketListCtrl'
@@ -21,4 +25,5 @@ helpdesk
 		templateUrl: '/templates/ticket.html',
 		controller: 'ticketViewCtrl'
 	})
+
 });

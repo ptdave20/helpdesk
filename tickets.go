@@ -187,6 +187,19 @@ func InitTicketService(m *martini.ClassicMartini) {
 			}
 			return "unknown error"
 		})
+		r.Get("/building", RequireLogin(), func(u User, db *mgo.Database) string {
+			if !u.Building.Valid() {
+				return "invalid building"
+			}
+
+			c := db.C(TicketsC)
+
+			var tickets []Ticket
+
+			c.Find(bson.M{"building": u.Building}).All(&tickets)
+			b, _ := json.Marshal(tickets)
+			return string(b)
+		})
 		r.Get("/building/:id", RequireLogin(), func(u User, db *mgo.Database, p martini.Params) string {
 			if !u.Roles.DomainAdmin || (u.Building.Hex() != p["id"] && u.Roles.BldgViewTicket) {
 				return "access denied"

@@ -105,6 +105,12 @@ helpdesk.service('TicketService', ['$http',function($http) {
 		this.Create = function(ticket) {
 			console.log(ticket);
 		}
+		this.MyBuilding = function() {
+			return $http.get('/o/tickets/building', {withCredentials:true});
+		}
+		this.Building = function(id) {
+			return $http.get('/o/tickets/building/'+id,{withCredentials:true});
+		}
 	}
 
 	return new TicketService();
@@ -117,6 +123,17 @@ helpdesk.filter('categories', function() {
 				return input[i].Category;
 		}
 		return [];
+	}
+});
+
+helpdesk.filter('user_name', function($http) {
+	
+	return function(id) {
+		var ret = "";
+		$http.get('/o/user/'+id,{withCredentials:true}).success(function(data) {
+			ret = data.Firstname + " " + data.Lastname;
+		});
+		return ret;
 	}
 });
 
@@ -484,6 +501,21 @@ helpdesk.controller('depTicketListCtrl', ['$scope','$http','DeptTickets','Depart
 	}
 }]);
 
+helpdesk.controller('myBuildingTicketsCtrl', ['$scope', '$http', '$interval', 'TicketService', function($scope,$http,$interval,TicketService) {
+	$scope.TicketService = TicketService;
+	$scope.tickets = [];
+	$scope.getTickets = function() {
+		TicketService.MyBuilding().success(function(data) {
+			$scope.tickets = data || [];
+		});
+	}
+	$scope.getTickets();
+	$scope.bg = $interval($scope.getTickets, 10000, 0,true);
+	$scope.$on('$routeChangeStart', function() {
+		$interval.cancel($scope.bg);
+	});
+}]);
+
 helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope,$http) {
 	$scope.options = {
 		ticket: {
@@ -502,7 +534,7 @@ helpdesk.controller('assignedTicketListCtrl', ['$scope','$http', function($scope
 	$scope.tickets = $scope.$parent.mine;
 }]);
 
-helpdesk.controller('homeCtrl', ['$scope', '$http', '$interval', 'TicketService', function($scope,$http,$interval,TicketService) {
+helpdesk.controller('homeCtrl', ['$scope', '$http', '$interval', 'TicketService','UserService', function($scope,$http,$interval,TicketService,UserService) {
 	$scope.getSubmissions = function() {
 		$http.get('/o/tickets/submitted/all',{withCredentials:true}).success(function(data) {
 			$scope.mytickets = data;

@@ -20,3 +20,8 @@ ToDo
 - Build department / assigned ticket views
 - Build administration
 - Finish instructions
+- IMAP mail check backend
+
+Goals
+-----
+- Build a chrome extension
