@@ -8,7 +8,7 @@ import (
 	"labix.org/v2/mgo/bson"
 )
 
-func (cfg Config) Load() bool {
+func (cfg *Config) Load() bool {
 	cfgBytes, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		return false
@@ -21,51 +21,43 @@ func (cfg Config) Load() bool {
 	return true
 }
 
-func (cfg Config) FirstTimeSetup() bool {
+func (cfg *Config) FirstTimeSetup() bool {
 	print("Enter your ClientID: ")
-	var clientid, secret, host, mongo, db string
-	_, err := fmt.Scanf("%s\n", &clientid)
+	_, err := fmt.Scanf("%s\n", &cfg.ClientID)
 	if err != nil {
 		return false
 	}
 
 	print("Enter your Client Secret: ")
-	_, err = fmt.Scanf("%s\n", &secret)
+	_, err = fmt.Scanf("%s\n", &cfg.ClientSecret)
 	if err != nil {
 		return false
 	}
 
 	print("Enter your Host Name: http://")
-	_, err = fmt.Scanf("%s\n", &host)
+	_, err = fmt.Scanf("%s\n", &cfg.Hostname)
 	if err != nil {
 		return false
 	}
 
 	print("Enter your MongoDB Address: mongodb://")
-	_, err = fmt.Scanf("%s\n", &mongo)
+	_, err = fmt.Scanf("%s\n", &cfg.MongoAddress)
 	if err != nil {
 		return false
 	}
 
 	print("Enter your MongoDB Database: ")
-	_, err = fmt.Scanf("%s\n", &db)
+	_, err = fmt.Scanf("%s\n", &cfg.MongoDatabase)
 	if err != nil {
 		return false
 	}
 
-	cfg.ClientID = clientid
-	cfg.ClientSecret = secret
-	cfg.RedirectURI = host + "/o/token"
-	cfg.Hostname = host
-	cfg.MongoAddress = mongo
-	cfg.MongoDatabase = db
-
-	cfg.SetupDB()
+	cfg.RedirectURI = cfg.Hostname + "/o/token"
 
 	return true
 }
 
-func (cfg Config) SetupDB() (bool, error) {
+func (cfg *Config) SetupDB() (bool, error) {
 	session, err := mgo.Dial(cfg.MongoAddress)
 	if err != nil {
 		return false, err
@@ -108,7 +100,7 @@ func (cfg Config) SetupDB() (bool, error) {
 	return true, nil
 }
 
-func (cfg Config) Save() (bool, error) {
+func (cfg *Config) Save() (bool, error) {
 	cfgBytes, err := json.Marshal(&cfg)
 	err = ioutil.WriteFile("config.json", cfgBytes, 0755)
 	if err != nil {
