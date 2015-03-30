@@ -226,6 +226,7 @@ type (
 
 func (t Ticket) Marshal() string {
 	b, _ := json.Marshal(t)
+	println(b)
 	return string(b)
 }
 
